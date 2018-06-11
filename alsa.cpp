@@ -1,6 +1,6 @@
 #include <alsa/asoundlib.h>
 
-static char *device = "default";                        /* playback device */
+static const char *device = "default";                        /* playback device */
 static snd_output_t *output = NULL;
 
 int playback(const void* buffer, int length)
