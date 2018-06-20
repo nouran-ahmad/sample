@@ -4,7 +4,6 @@
 #include <espeak-ng/speak_lib.h>
 #include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
-#include "alsa.h"
 #include <pulse/simple.h>
 #include <pulse/error.h>
 #include <pulse/sample.h>
@@ -15,7 +14,6 @@ espeak_POSITION_TYPE position_type;
 espeak_AUDIO_OUTPUT output;
 tesseract::TessBaseAPI *api;
 
-char *path = NULL;
 int Buflength = 500, Options = 0;
 void* user_data;
 t_espeak_callback *SynthCallback;
@@ -34,7 +32,6 @@ int synthesisCallback(short* waveData, int sampleCount, espeak_EVENT* event) {
 		int error;
 		pa_simple_write(pulseAudio, (char*) waveData, sampleCount * 2, &error);
 		pa_simple_drain(pulseAudio, &error);
-		//		playback(waveData, sampleCount);
 	}
 }
 
@@ -88,10 +85,12 @@ int main(int argc, char* argv[]) {
 	printf("OCR output:\n%s", text);
 
 	printf("Starting espeak \n");
+
 	output = AUDIO_OUTPUT_RETRIEVAL;
 	int I, Run = 1, L;
-	espeak_Initialize(output, Buflength, path, Options);
-	espeak_SetParameter(espeakVOICETYPE, 1, 0);
+	espeak_Initialize(output, Buflength, "/usr/local/share/espeak-ng-data",
+			Options);
+
 	const char *langNativeString = "ar";
 	espeak_VOICE voice;
 
@@ -101,8 +100,10 @@ int main(int argc, char* argv[]) {
 	voice.variant = 2;
 	voice.gender = 1;
 
-	espeak_SetVoiceByProperties(&voice);
+	espeak_SetVoiceByName("mb-ar1");
 	Size = strlen(text) + 1;
+	espeak_SetParameter(espeakVOICETYPE, 1, 0);
+	espeak_SetParameter(espeakRATE, 110, 0);
 
 	espeak_SetSynthCallback(synthesisCallback);
 

@@ -7,7 +7,7 @@
 espeak_POSITION_TYPE position_type;
 espeak_AUDIO_OUTPUT output;
 
-char *path=NULL;
+char *espeakDataPath=NULL;
 int Buflength = 500, Options=0;
 void* user_data;
 t_espeak_callback *SynthCallback;
@@ -34,7 +34,7 @@ int main(int argc, char* argv[] )
 
     output = AUDIO_OUTPUT_RETRIEVAL;
     int I, Run = 1, L;    
-    espeak_Initialize(output, Buflength, path, Options ); 
+    espeak_Initialize(output, Buflength, espeakDataPath, Options ); 
     espeak_SetVoiceByName(Voice);
     const char *langNativeString = "en"; //Default to US English
     espeak_VOICE voice;

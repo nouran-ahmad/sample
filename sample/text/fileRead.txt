@@ -1,0 +1,7 @@
+	string line;
+	ifstream myfile;
+	myfile.open("../text/arabic.txt");
+	getline(myfile, line);
+	myfile.close();
+	const char* txt = line.c_str();
+	printf("line read:\n%s", txt);
