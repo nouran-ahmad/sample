@@ -10,17 +10,16 @@
 
 #define BUFSIZE 1024
 
-espeak_POSITION_TYPE position_type;
+espeak_POSITION_TYPE positionType;
 espeak_AUDIO_OUTPUT output;
 tesseract::TessBaseAPI *api;
 
 int Buflength = 500, Options = 0;
-void* user_data;
+void* userData;
 t_espeak_callback *SynthCallback;
-espeak_PARAMETER Parm;
 char *text;
-unsigned int Size, position = 0, end_position = 0, flags = espeakCHARS_AUTO,
-		*unique_identifier;
+unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO,
+		*uniqueIdentifier;
 
 pa_simple *pulseAudio = NULL;
 
@@ -48,12 +47,11 @@ void setupTesseract() {
 	api = new tesseract::TessBaseAPI();
 	// Initialize tesseract-ocr with Arabic, with specifying tessdata path
 	printf("Start tesseract Initialize:\n");
-	if (api->Init("/home/pi/Desktop/project/sample/tesseract-example/tessdata",
+	if (api->Init("../tessdata",
 			"ara")) {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
 	}
-	printf("End tesseract Initialize:\n");
 }
 
 void setupPulseAudio() {
@@ -71,48 +69,35 @@ void setupPulseAudio() {
 	}
 }
 
+void setupEspeak() {
+	output = AUDIO_OUTPUT_RETRIEVAL;
+	espeak_Initialize(output, Buflength, "/usr/local/share/espeak-ng-data",
+			Options);
+	espeak_SetVoiceByName("mb-ar1");
+	espeak_SetParameter(espeakVOICETYPE, 1, 0);
+	espeak_SetParameter(espeakPITCH, 50, 0);
+	espeak_SetParameter(espeakRATE, 110, 0);
+	espeak_SetSynthCallback(synthesisCallback);
+}
+
 int main(int argc, char* argv[]) {
 
 	setupPulseAudio();
-	printf("Starting tesseract \n");
 	setupTesseract();
+	setupEspeak();
 
 	Pix *image = pixRead("../img/arabic2.png");
 	api->SetImage(image);
-	// Get OCR result
 	char *text;
 	text = api->GetUTF8Text();
 	printf("OCR output:\n%s", text);
 
-	printf("Starting espeak \n");
-
-	output = AUDIO_OUTPUT_RETRIEVAL;
-	int I, Run = 1, L;
-	espeak_Initialize(output, Buflength, "/usr/local/share/espeak-ng-data",
-			Options);
-
-	const char *langNativeString = "ar";
-	espeak_VOICE voice;
-
-	memset(&voice, 0, sizeof(espeak_VOICE)); // Zero out the voice first
-	voice.languages = langNativeString;
-	voice.name = "mb-ar1";
-	voice.variant = 2;
-	voice.gender = 1;
-
-	espeak_SetVoiceByName("mb-ar1");
-	Size = strlen(text) + 1;
-	espeak_SetParameter(espeakVOICETYPE, 1, 0);
-	espeak_SetParameter(espeakRATE, 110, 0);
-
-	espeak_SetSynthCallback(synthesisCallback);
-
-	espeak_Synth(text, Size, position, position_type, end_position, flags,
-			unique_identifier, user_data);
+	unsigned int size = strlen(text) + 1;
+	espeak_Synth(text, size, position, positionType, endPosition, flags,
+			uniqueIdentifier, userData);
 	espeak_Synchronize();
 
 	cleanupMemory(text, image);
 
 	return 0;
 }
-

@@ -9,14 +9,14 @@ espeak_AUDIO_OUTPUT output;
 
 char *espeakDataPath=NULL;
 int Buflength = 500, Options=0;
-void* user_data;
+void* userData;
 t_espeak_callback *SynthCallback;
 espeak_PARAMETER Parm;
 
 char Voice[] = {"English"};
 
 char *text = {"hello world this is an english test"};
-unsigned int Size,position=0, end_position=0, flags=espeakCHARS_AUTO, *unique_identifier;
+unsigned int size,position=0, end_position=0, flags=espeakCHARS_AUTO, *uniqueIdentifier;
 
 int synthesisCallback(short* waveData, int sampleCount, espeak_EVENT* event) 
 {
@@ -46,12 +46,12 @@ int main(int argc, char* argv[] )
     voice.gender = 1;
     
     espeak_SetVoiceByProperties(&voice);
-    Size = strlen(text)+1;    
+    size = strlen(text)+1;    
 
     espeak_SetSynthCallback(synthesisCallback);
     
-    espeak_Synth( text, Size, position, position_type, end_position, flags,
-      unique_identifier, user_data );
+    espeak_Synth( text, size, position, position_type, end_position, flags,
+      uniqueIdentifier, userData );
     
     espeak_Synchronize();
 
