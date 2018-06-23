@@ -17,7 +17,7 @@ Source code:	https://github.com/linuxscout/espeak-ng
 
     sudo apt-get intall mbrola
 
-- ####PulseAudio CLI
+- #### PulseAudio CLI
 start pulse Audio server to enable the sound driver in Raspberry Pi
         
     pulseaudio &
