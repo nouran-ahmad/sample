@@ -14,10 +14,22 @@ extracting text from images for Arabic language
 
 - ### eSpeak-ng Text to Speech 
 Source code:	https://github.com/linuxscout/espeak-ng
-
-    sudo apt-get intall mbrola
+	
+install mbrola binary from project files or from mbrola website:
+http://tcts.fpms.ac.be/synthesis/mbrola.html
+ 
+extract the file to /usr/local/bin 
 
 - #### PulseAudio CLI
+
+Install alsa and pulseAudio
+sudo apt-get install libasound2-dev
+
+sudo apt-get install libpulse-dev
+
+sudo apt-get install espeak-ng
+
+
 start pulse Audio server to enable the sound driver in Raspberry Pi
         
     pulseaudio &
