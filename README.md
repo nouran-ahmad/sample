@@ -20,15 +20,25 @@ http://tcts.fpms.ac.be/synthesis/mbrola.html
  
 extract the file to /usr/local/bin 
 
-- #### PulseAudio CLI
+install espeak
+you can install espeak using this command but wont be the latest:
+sudo apt-get install espeak-ng
+
+but instead clone the repo from github, install dependecies:
+sudo apt-get install make autoconf automake libtool pkg-config
+
+./autogen.sh
+./configure 
+make
+sudo make install
+
+- #### PulseAudio
 
 Install alsa and pulseAudio
+sudo apt-get install pulseaudio
 sudo apt-get install libasound2-dev
 
 sudo apt-get install libpulse-dev
-
-sudo apt-get install espeak-ng
-
 
 start pulse Audio server to enable the sound driver in Raspberry Pi
         
