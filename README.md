@@ -65,4 +65,4 @@ remove new line at mb-ar1 at /usr/local/share/espeak-ng-data/voices/mb
 
 - sudo modprobe snd_bcm2835 (on rbp3 only)
 
--  speaker-test -c2
+- speaker-test -c2
