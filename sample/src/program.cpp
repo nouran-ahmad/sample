@@ -8,18 +8,16 @@
 #include <pulse/error.h>
 #include <pulse/sample.h>
 
-#define BUFSIZE 1024
-
-espeak_POSITION_TYPE positionType;
+espeak_POSITION_TYPE positionType = POS_WORD;
 espeak_AUDIO_OUTPUT output;
 tesseract::TessBaseAPI *api;
 
-int Buflength = 500, Options = 0;
+int Buflength = 10000, Options = 0;
 void* userData;
 t_espeak_callback *SynthCallback;
 char *text;
 unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO,
-		*uniqueIdentifier;
+		*uniqueIdentifier=NULL;
 
 pa_simple *pulseAudio = NULL;
 
@@ -29,8 +27,8 @@ int synthesisCallback(short* waveData, int sampleCount, espeak_EVENT* event) {
 			sampleCount, event->type);
 	if (waveData) {
 		int error;
-		pa_simple_write(pulseAudio, (char*) waveData, sampleCount * 2, &error);
-		pa_simple_drain(pulseAudio, &error);
+		int e = pa_simple_write(pulseAudio, (char*) waveData, sampleCount * 2, &error);
+		int e2 = pa_simple_drain(pulseAudio, &error);
 	}
 }
 
@@ -75,7 +73,7 @@ void setupEspeak() {
 			Options);
 	espeak_SetVoiceByName("mb-ar1");
 	espeak_SetParameter(espeakVOICETYPE, 1, 0);
-	espeak_SetParameter(espeakPITCH, 50, 0);
+	espeak_SetParameter(espeakPITCH, 40, 0);
 	espeak_SetParameter(espeakRATE, 110, 0);
 	espeak_SetSynthCallback(synthesisCallback);
 }
@@ -97,7 +95,8 @@ int main(int argc, char* argv[]) {
 			uniqueIdentifier, userData);
 	espeak_Synchronize();
 
+	espeak_Terminate();
 	cleanupMemory(text, image);
-
+	
 	return 0;
 }
