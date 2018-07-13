@@ -14,6 +14,7 @@ cd ./leptonica-1.76.0
 ./configure
 make
 sudo make install
+cd ..
 
 echo installing pulseAudio cli and libs:
 echo ==============================
@@ -21,6 +22,14 @@ echo ==============================
 sudo apt-get install pulseaudio
 sudo apt-get install libasound2-dev
 sudo apt-get install libpulse-dev
+
+git clone https://github.com/rhdunn/pcaudiolib.git
+cd ./pcaudiolib
+./autogen.sh
+./configure --prefix=/usr
+make
+sudo make install
+cd ..
 
 echo installing autotools:
 echo ==============================
@@ -35,6 +44,7 @@ cd ./espeak-ng
 ./configure 
 make
 sudo make install
+cd ..
 
 echo downloading mbrola binaries:
 curl -O http://tcts.fpms.ac.be/synthesis/mbrola/bin/raspberri_pi/mbrola.tgz
