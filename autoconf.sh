@@ -54,3 +54,16 @@ sudo mkdir /usr/share/mbrola
  
 cp ./mbrola/ar1 -r /usr/share/mbrola
 cp ./mbrola/ar2 -r /usr/share/mbrola
+
+echo installing raspicam lib:
+echo ==============================
+cd ./dependencies
+sudo apt-get install unzip
+unzip raspicam-0.1.6.zip
+
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+sudo ldconfig
