@@ -17,7 +17,7 @@ old_library='liblept.a'
 inherited_linker_flags=''
 
 # Libraries that this one depends upon.
-dependency_libs=' -lm -lz -lpng16'
+dependency_libs=' -lm -lz -lpng16 -ljpeg -ltiff'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''

@@ -2,9 +2,29 @@
 echo installing tesseract:
 echo ==============================
 
-sudo apt-get install tesseract-ocr
-sudo apt-get install tesseract-ocr-dev
-sudo apt-get install tesseract-ocr-ara
+sudo apt-get install pkg-config
+sudo apt-get install libpng-dev
+sudo apt-get install libjpeg8-dev
+sudo apt-get install libtiff5-dev
+sudo apt-get install zlib1g-dev
+
+sudo apt-get install libicu-dev
+sudo apt-get install libpango1.0-dev
+sudo apt-get install libcairo2-dev
+sudo apt-get install libleptonica-dev
+
+
+git clone https://github.com/tesseract-ocr/tesseract.git
+cd ./tesseract
+git reset --hard b1f7990d9b94bb583d74c7004e85dffb1499fe8c 
+./autogen.sh
+./configure
+make
+sudo make install
+sudo ldconfig
+make training
+sudo make install training-install
+
 
 echo installing leptonica lib:
 echo ==============================

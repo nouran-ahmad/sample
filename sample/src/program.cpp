@@ -7,10 +7,12 @@
 #include <pulse/simple.h>
 #include <pulse/error.h>
 #include <pulse/sample.h>
+#include <raspicam/raspicam.h>
 
 espeak_POSITION_TYPE positionType = POS_WORD;
 espeak_AUDIO_OUTPUT output;
 tesseract::TessBaseAPI *api;
+raspicam::RaspiCam Camera; 
 
 int Buflength = 10000, Options = 0;
 void* userData;
@@ -45,7 +47,7 @@ void setupTesseract() {
 	api = new tesseract::TessBaseAPI();
 	// Initialize tesseract-ocr with Arabic, with specifying tessdata path
 	printf("Start tesseract Initialize:\n");
-	if (api->Init("../tessdata",
+	if (api->Init("/home/pi/Desktop/project/dependencies/tesseract/tessdata",
 			"ara")) {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
@@ -78,13 +80,27 @@ void setupEspeak() {
 	espeak_SetSynthCallback(synthesisCallback);
 }
 
+void setupRaspicam(){
+	
+		if ( !Camera.open() ) {
+			printf("Error opening camera");
+			exit(1);
+		}
+	}
+
 int main(int argc, char* argv[]) {
 
 	setupPulseAudio();
+	setupRaspicam();
 	setupTesseract();
 	setupEspeak();
-
-	Pix *image = pixRead("../img/arabic2.png");
+	
+	printf("capturing image:\n");
+	Camera.grab();
+	unsigned char *data=new unsigned char[  Camera.getImageTypeSize ( raspicam::RASPICAM_FORMAT_GRAY )];
+	Camera.retrieve ( data,raspicam::RASPICAM_FORMAT_GRAY );
+	 
+	Pix *image = pixRead(argv[1]);
 	api->SetImage(image);
 	char *text;
 	text = api->GetUTF8Text();

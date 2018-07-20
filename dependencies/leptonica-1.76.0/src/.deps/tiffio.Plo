@@ -38,7 +38,12 @@ tiffio.lo: tiffio.c /usr/include/stdc-predef.h ../config_auto.h \
  /usr/include/stdint.h /usr/include/arm-linux-gnueabihf/bits/wchar.h \
  array.h bbuffer.h heap.h list.h ptra.h queue.h rbtree.h stack.h \
  arrayaccess.h bmf.h ccbord.h dewarp.h gplot.h imageio.h jbclass.h \
- morph.h pix.h recog.h regutils.h stringcode.h sudoku.h watershed.h
+ morph.h pix.h recog.h regutils.h stringcode.h sudoku.h watershed.h \
+ /usr/include/arm-linux-gnueabihf/tiff.h \
+ /usr/include/arm-linux-gnueabihf/tiffconf.h \
+ /usr/include/arm-linux-gnueabihf/tiffio.h \
+ /usr/include/arm-linux-gnueabihf/tiff.h \
+ /usr/include/arm-linux-gnueabihf/tiffvers.h
 
 /usr/include/stdc-predef.h:
 
@@ -195,3 +200,13 @@ stringcode.h:
 sudoku.h:
 
 watershed.h:
+
+/usr/include/arm-linux-gnueabihf/tiff.h:
+
+/usr/include/arm-linux-gnueabihf/tiffconf.h:
+
+/usr/include/arm-linux-gnueabihf/tiffio.h:
+
+/usr/include/arm-linux-gnueabihf/tiff.h:
+
+/usr/include/arm-linux-gnueabihf/tiffvers.h:

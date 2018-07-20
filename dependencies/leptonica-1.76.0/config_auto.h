@@ -20,13 +20,13 @@
 /* #undef HAVE_LIBJP2K */
 
 /* Define to 1 if you have jpeg. */
-/* #undef HAVE_LIBJPEG */
+#define HAVE_LIBJPEG 1
 
 /* Define to 1 if you have libpng. */
 #define HAVE_LIBPNG 1
 
 /* Define to 1 if you have libtiff. */
-/* #undef HAVE_LIBTIFF */
+#define HAVE_LIBTIFF 1
 
 /* Define to 1 if you have libwebp. */
 /* #undef HAVE_LIBWEBP */

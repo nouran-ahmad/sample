@@ -32,6 +32,8 @@ libversions.lo: libversions.c /usr/include/stdc-predef.h ../config_auto.h \
  array.h bbuffer.h heap.h list.h ptra.h queue.h rbtree.h stack.h \
  arrayaccess.h bmf.h ccbord.h dewarp.h gplot.h imageio.h jbclass.h \
  morph.h pix.h recog.h regutils.h stringcode.h sudoku.h watershed.h \
+ /usr/include/jpeglib.h /usr/include/arm-linux-gnueabihf/jconfig.h \
+ /usr/include/jmorecfg.h /usr/include/jerror.h \
  /usr/include/libpng16/png.h /usr/include/libpng16/pnglibconf.h \
  /usr/include/libpng16/pngconf.h \
  /usr/lib/gcc/arm-linux-gnueabihf/6/include-fixed/limits.h \
@@ -41,7 +43,11 @@ libversions.lo: libversions.c /usr/include/stdc-predef.h ../config_auto.h \
  /usr/include/linux/limits.h \
  /usr/include/arm-linux-gnueabihf/bits/posix2_lim.h /usr/include/setjmp.h \
  /usr/include/arm-linux-gnueabihf/bits/setjmp.h /usr/include/xlocale.h \
- /usr/include/zlib.h /usr/include/zconf.h /usr/include/unistd.h \
+ /usr/include/arm-linux-gnueabihf/tiffio.h \
+ /usr/include/arm-linux-gnueabihf/tiff.h \
+ /usr/include/arm-linux-gnueabihf/tiffconf.h \
+ /usr/include/arm-linux-gnueabihf/tiffvers.h /usr/include/zlib.h \
+ /usr/include/zconf.h /usr/include/unistd.h \
  /usr/include/arm-linux-gnueabihf/bits/posix_opt.h \
  /usr/include/arm-linux-gnueabihf/bits/environments.h \
  /usr/include/arm-linux-gnueabihf/bits/confname.h /usr/include/getopt.h
@@ -176,6 +182,14 @@ sudoku.h:
 
 watershed.h:
 
+/usr/include/jpeglib.h:
+
+/usr/include/arm-linux-gnueabihf/jconfig.h:
+
+/usr/include/jmorecfg.h:
+
+/usr/include/jerror.h:
+
 /usr/include/libpng16/png.h:
 
 /usr/include/libpng16/pnglibconf.h:
@@ -201,6 +215,14 @@ watershed.h:
 /usr/include/arm-linux-gnueabihf/bits/setjmp.h:
 
 /usr/include/xlocale.h:
+
+/usr/include/arm-linux-gnueabihf/tiffio.h:
+
+/usr/include/arm-linux-gnueabihf/tiff.h:
+
+/usr/include/arm-linux-gnueabihf/tiffconf.h:
+
+/usr/include/arm-linux-gnueabihf/tiffvers.h:
 
 /usr/include/zlib.h:
 
