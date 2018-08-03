@@ -7,7 +7,11 @@
 #include <pulse/simple.h>
 #include <pulse/error.h>
 #include <pulse/sample.h>
+#include <iostream>
+#include <fstream>
 #include <raspicam/raspicam.h>
+#include <ctime>
+#include <unistd.h>
 
 espeak_POSITION_TYPE positionType = POS_WORD;
 espeak_AUDIO_OUTPUT output;
@@ -20,7 +24,7 @@ t_espeak_callback *SynthCallback;
 char *text;
 unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO,
 		*uniqueIdentifier=NULL;
-
+using namespace std;
 pa_simple *pulseAudio = NULL;
 
 int synthesisCallback(short* waveData, int sampleCount, espeak_EVENT* event) {
@@ -82,11 +86,21 @@ void setupEspeak() {
 
 void setupRaspicam(){
 	
-		if ( !Camera.open() ) {
-			printf("Error opening camera");
-			exit(1);
-		}
+	Camera.setFormat(raspicam::RASPICAM_FORMAT_GRAY);
+	//Camera.setEncoding ( raspicam::RASPICAM_ENCODING_PNG );
+	Camera.setWidth(640);
+    Camera.setHeight(480);
+    Camera.setBrightness(70);
+	Camera.setSharpness(100);
+    Camera.setContrast(100);
+	
+	if ( !Camera.open() ) {
+		printf("Error opening camera");
+		exit(1);
 	}
+	
+	sleep(1);    
+}
 
 int main(int argc, char* argv[]) {
 
@@ -95,24 +109,36 @@ int main(int argc, char* argv[]) {
 	setupTesseract();
 	setupEspeak();
 	
-	printf("capturing image:\n");
-	Camera.grab();
-	unsigned char *data=new unsigned char[  Camera.getImageTypeSize ( raspicam::RASPICAM_FORMAT_GRAY )];
-	Camera.retrieve ( data,raspicam::RASPICAM_FORMAT_GRAY );
-	 
-	Pix *image = pixRead(argv[1]);
+	printf("==== start capturing image ====\n");
+	
+	Camera.startCapture();
+	if(!Camera.grab()) {
+	    printf("Camera buffer grabbing failed!\n");
+	}
+	
+	int imageSize = Camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_GRAY);
+	unsigned char *data=new unsigned char[imageSize];
+	Camera.retrieve(data);
+	
+	std::ofstream outFile("test.pgm",std::ios::binary);
+    outFile<<"P5\n"<<Camera.getWidth() <<" "<<Camera.getHeight() <<" 255\n";
+    outFile.write(( char* )data,imageSize);
+	outFile.close();
+	printf("==== image saved to test.pgm ====\n");
+	
+	Pix *image = pixRead("test.pgm");
 	api->SetImage(image);
 	char *text;
 	text = api->GetUTF8Text();
 	printf("OCR output:\n%s", text);
 
 	unsigned int size = strlen(text) + 1;
-	espeak_Synth(text, size, position, positionType, endPosition, flags,
-			uniqueIdentifier, userData);
+	espeak_Synth(text, size, position, positionType, endPosition, flags,	uniqueIdentifier, userData);
 	espeak_Synchronize();
-
 	espeak_Terminate();
 	cleanupMemory(text, image);
 	
+    Camera.release();
+	delete data;
 	return 0;
 }
