@@ -12,9 +12,9 @@
 #include <raspicam/raspicam.h>
 #include <ctime>
 #include <unistd.h>
+#include <opencv/cv.h>
 
-espeak_POSITION_TYPE positionType = POS_WORD;
-espeak_AUDIO_OUTPUT output;
+
 tesseract::TessBaseAPI *api;
 raspicam::RaspiCam Camera; 
 
@@ -24,8 +24,10 @@ t_espeak_callback *SynthCallback;
 char *text;
 unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO,
 		*uniqueIdentifier=NULL;
-using namespace std;
 pa_simple *pulseAudio = NULL;
+
+using namespace std;
+using namespace cv;
 
 int synthesisCallback(short* waveData, int sampleCount, espeak_EVENT* event) {
 
@@ -74,7 +76,7 @@ void setupPulseAudio() {
 }
 
 void setupEspeak() {
-	output = AUDIO_OUTPUT_RETRIEVAL;
+	espeak_AUDIO_OUTPUT output = AUDIO_OUTPUT_RETRIEVAL;
 	espeak_Initialize(output, Buflength, "/usr/local/share/espeak-ng-data",
 			Options);
 	espeak_SetVoiceByName("mb-ar1");
@@ -102,13 +104,7 @@ void setupRaspicam(){
 	sleep(1);    
 }
 
-int main(int argc, char* argv[]) {
-
-	setupPulseAudio();
-	setupRaspicam();
-	setupTesseract();
-	setupEspeak();
-	
+void captureImage(){
 	printf("==== start capturing image ====\n");
 	
 	Camera.startCapture();
@@ -126,19 +122,33 @@ int main(int argc, char* argv[]) {
 	outFile.close();
 	printf("==== image saved to test.pgm ====\n");
 	
-	Pix *image = pixRead("test.pgm");
+	}
+
+int main(int argc, char* argv[]) {
+
+	setupPulseAudio();
+	//setupRaspicam();
+	setupTesseract();
+	setupEspeak();
+	
+	//captureImage();
+	
+	Pix *image = pixRead(argv[1]);
 	api->SetImage(image);
 	char *text;
 	text = api->GetUTF8Text();
 	printf("OCR output:\n%s", text);
 
 	unsigned int size = strlen(text) + 1;
+
+	espeak_POSITION_TYPE positionType = POS_WORD;
+		
 	espeak_Synth(text, size, position, positionType, endPosition, flags,	uniqueIdentifier, userData);
 	espeak_Synchronize();
 	espeak_Terminate();
 	cleanupMemory(text, image);
 	
-    Camera.release();
-	delete data;
+    //Camera.release();
+	//delete data;
 	return 0;
 }
