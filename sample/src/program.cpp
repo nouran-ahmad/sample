@@ -151,10 +151,7 @@ Mat deskew(double angle, Mat img){
 
 double compute_skew(Mat src) {
    
-   cv::threshold(src, src, 127, 255, cv::THRESH_BINARY);
-   AdaptiveThreshold(src,src,255,ADAPTIVE_THRESH_GAUSSIAN_C,CV_THRESH_BINARY,13,0);
-
-
+   //AdaptiveThreshold(src,src,255,ADAPTIVE_THRESH_GAUSSIAN_C,CV_THRESH_BINARY,13,0);
 
    cv::Size size = src.size();
    cv::bitwise_not(src, src);
@@ -176,6 +173,9 @@ double compute_skew(Mat src) {
 
 void imageProcessing(char* argv[]){
 	cv::Mat src = cv::imread(argv[1], 0);
+	// convert to binary
+	cv::threshold(src, src, 127, 255, cv::THRESH_BINARY);
+   
 	double degrees = compute_skew(src);
 	Mat result= deskew(degrees, src);
     imwrite( argv[2], result );	
