@@ -16,7 +16,7 @@ sudo apt-get install libleptonica-dev
 
 git clone https://github.com/tesseract-ocr/tesseract.git
 cd ./tesseract
-git reset --hard b1f7990d9b94bb583d74c7004e85dffb1499fe8c 
+git reset --hard 18787ea12b2ea9368c8e1c0128d1f8aef2beebc8 
 ./autogen.sh
 ./configure
 make
