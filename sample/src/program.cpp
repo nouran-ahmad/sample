@@ -13,7 +13,9 @@
 #include <ctime>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
-
+#include <curlpp/cURLpp.hpp>
+#include <curlpp/Options.hpp>
+#include <curlpp/Easy.hpp>
 
 tesseract::TessBaseAPI *api;
 raspicam::RaspiCam Camera; 
@@ -181,28 +183,45 @@ void imageProcessing(char* argv[]){
     imwrite( argv[2], result );	
 	}
 
+
 int main(int argc, char* argv[]) {
 
 	setupPulseAudio();
 	//setupRaspicam();
 	setupTesseract();
-	setupEspeak();
+	//setupEspeak();
 	
 	//captureImage();
 	//imageProcessing();
   
-	Pix *image = pixRead(argv[1]);
+    char *text;
+    Pix *image = pixRead(argv[1]);
 	api->SetImage(image);
-	char *text;
 	text = api->GetUTF8Text();
 	printf("OCR output:\n%s", text);
 
-	unsigned int size = strlen(text) + 1;
+
+    unsigned int size = strlen(text) + 1;
+    std::ostringstream os;
+    string textUrlEncoded = curlpp::escape(std::string(text)); 
+    curlpp::options::Url myUrl(std::string("http://127.0.0.1:8080/ajaxGet?text=")+textUrlEncoded+"&action=Tashkeel");
+    curlpp::Easy myRequest;
+    myRequest.setOpt(myUrl);
+    
+    myRequest.perform();  
+    os << myRequest;
+    printf("curl output:\n%s", os.str());
+     ofstream myfile;
+  myfile.open ("result.txt");
+  myfile << os.str();
+  myfile.close();
+	
 	espeak_POSITION_TYPE positionType = POS_WORD;
 		
-	espeak_Synth(text, size, position, positionType, endPosition, flags,	uniqueIdentifier, userData);
-	espeak_Synchronize();
-	espeak_Terminate();
+	//espeak_Synth(text, size, position, positionType, endPosition, flags,	uniqueIdentifier, userData);
+	//espeak_Synchronize();
+	
+	//espeak_Terminate();
 	cleanupMemory(text, image);
 	
     //Camera.release();
