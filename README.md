@@ -2,12 +2,15 @@
 installing tesseract command
 
 	sudo apt-get install tesseract-ocr
+
 installing development lib command
 
 	sudo apt-get install tesseract-ocr-dev
+
 installing Arabic packages
 
 	sudo apt-get install tesseract-ocr-ara
+
 extracting text from images for Arabic language
 
 	tesseract -l ara input-image output-text-file

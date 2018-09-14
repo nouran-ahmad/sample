@@ -81,7 +81,7 @@ void setupEspeak() {
 	espeak_AUDIO_OUTPUT output = AUDIO_OUTPUT_RETRIEVAL;
 	espeak_Initialize(output, Buflength, "/usr/local/share/espeak-ng-data",
 			Options);
-	espeak_SetVoiceByName("mb-ar1");
+	espeak_SetVoiceByName("ar1");
 	espeak_SetParameter(espeakVOICETYPE, 1, 0);
 	espeak_SetParameter(espeakPITCH, 40, 0);
 	espeak_SetParameter(espeakRATE, 110, 0);
@@ -183,13 +183,24 @@ void imageProcessing(char* argv[]){
     imwrite( argv[2], result );	
 	}
 
+string diacritizeText(string text){
+	std::ostringstream os;
+    string textUrlEncoded = curlpp::escape(text); 
+    curlpp::options::Url myUrl(std::string("http://127.0.0.1:8080/ajaxGet?resultType=text&text=")+textUrlEncoded+"&action=TashkeelText");
+    curlpp::Easy myRequest;
+    myRequest.setOpt(myUrl);
+    myRequest.perform();  
+    os << myRequest;
+    return os.str();
+	}
+
 
 int main(int argc, char* argv[]) {
 
 	setupPulseAudio();
 	//setupRaspicam();
 	setupTesseract();
-	//setupEspeak();
+	setupEspeak();
 	
 	//captureImage();
 	//imageProcessing();
@@ -198,30 +209,18 @@ int main(int argc, char* argv[]) {
     Pix *image = pixRead(argv[1]);
 	api->SetImage(image);
 	text = api->GetUTF8Text();
-	printf("OCR output:\n%s", text);
-
-
-    unsigned int size = strlen(text) + 1;
-    std::ostringstream os;
-    string textUrlEncoded = curlpp::escape(std::string(text)); 
-    curlpp::options::Url myUrl(std::string("http://127.0.0.1:8080/ajaxGet?text=")+textUrlEncoded+"&action=Tashkeel");
-    curlpp::Easy myRequest;
-    myRequest.setOpt(myUrl);
     
-    myRequest.perform();  
-    os << myRequest;
-    printf("curl output:\n%s", os.str());
-     ofstream myfile;
-  myfile.open ("result.txt");
-  myfile << os.str();
-  myfile.close();
+    //string textWithDiactr = diacritizeText(std::string(text));
+    printf("\n%s", text);
 	
 	espeak_POSITION_TYPE positionType = POS_WORD;
-		
-	//espeak_Synth(text, size, position, positionType, endPosition, flags,	uniqueIdentifier, userData);
-	//espeak_Synchronize();
+	//espeak_Synth(textWithDiactr.c_str(), textWithDiactr.size(), position, 
+	//positionType, endPosition, flags,	uniqueIdentifier, userData);
+	espeak_Synth(text, strlen(text)+1, position, 
+	positionType, endPosition, flags,	uniqueIdentifier, userData);
+	espeak_Synchronize();
 	
-	//espeak_Terminate();
+	espeak_Terminate();
 	cleanupMemory(text, image);
 	
     //Camera.release();
