@@ -16,6 +16,7 @@
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Options.hpp>
 #include <curlpp/Easy.hpp>
+#include <wiringPi.h> 
 
 tesseract::TessBaseAPI *api;
 raspicam::RaspiCam Camera; 
@@ -23,9 +24,7 @@ raspicam::RaspiCam Camera;
 int Buflength = 10000, Options = 0;
 void* userData;
 t_espeak_callback *SynthCallback;
-char *text;
-unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO,
-		*uniqueIdentifier=NULL;
+
 pa_simple *pulseAudio = NULL;
 
 using namespace std;
@@ -81,7 +80,7 @@ void setupEspeak() {
 	espeak_AUDIO_OUTPUT output = AUDIO_OUTPUT_RETRIEVAL;
 	espeak_Initialize(output, Buflength, "/usr/local/share/espeak-ng-data",
 			Options);
-	espeak_SetVoiceByName("ar1");
+	espeak_SetVoiceByName("mb-ar1");
 	espeak_SetParameter(espeakVOICETYPE, 1, 0);
 	espeak_SetParameter(espeakPITCH, 40, 0);
 	espeak_SetParameter(espeakRATE, 110, 0);
@@ -174,9 +173,9 @@ double compute_skew(Mat src) {
 }
 
 void imageProcessing(char* argv[]){
-	cv::Mat src = cv::imread(argv[1], 0);
+	Mat src = imread(argv[1], 0);
 	// convert to binary
-	cv::threshold(src, src, 127, 255, cv::THRESH_BINARY);
+	threshold(src, src, 127, 255, cv::THRESH_BINARY);
    
 	double degrees = compute_skew(src);
 	Mat result= deskew(degrees, src);
@@ -194,35 +193,43 @@ string diacritizeText(string text){
     return os.str();
 	}
 
+void imageToSpeech(Pix *image){
+	
+	api->SetImage(image);
+	char *text = api->GetUTF8Text();
+    if(strlen(text) > 0){
+    string textWithDiactr = diacritizeText(std::string(text));
+    printf("\n%s", textWithDiactr);
+	
+	espeak_POSITION_TYPE positionType = POS_WORD;
+	unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO;
+	espeak_Synth(textWithDiactr.c_str(), textWithDiactr.size(), position, 
+	positionType, endPosition, flags,	NULL, userData);
+	espeak_Synchronize();
+    cleanupMemory(text, image);
+	}
+}
 
 int main(int argc, char* argv[]) {
 
 	setupPulseAudio();
+	wiringPiSetup();
 	//setupRaspicam();
-	setupTesseract();
-	setupEspeak();
 	
+	//setupTesseract();
+	//setupEspeak();
+	
+	pinMode(15, INPUT);
+	int status = digitalRead(15);
+	printf("Pin Input = %d\n", status);
+
 	//captureImage();
-	//imageProcessing();
+	//imageProcessing(argv);
   
-    char *text;
-    Pix *image = pixRead(argv[1]);
-	api->SetImage(image);
-	text = api->GetUTF8Text();
-    
-    //string textWithDiactr = diacritizeText(std::string(text));
-    printf("\n%s", text);
-	
-	espeak_POSITION_TYPE positionType = POS_WORD;
-	//espeak_Synth(textWithDiactr.c_str(), textWithDiactr.size(), position, 
-	//positionType, endPosition, flags,	uniqueIdentifier, userData);
-	espeak_Synth(text, strlen(text)+1, position, 
-	positionType, endPosition, flags,	uniqueIdentifier, userData);
-	espeak_Synchronize();
-	
-	espeak_Terminate();
-	cleanupMemory(text, image);
-	
+    //Pix *image = pixRead(argv[1]);
+	//imageToSpeech(image);
+
+	//espeak_Terminate();
     //Camera.release();
 	//delete data;
 	return 0;
