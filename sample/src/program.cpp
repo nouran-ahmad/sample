@@ -40,12 +40,14 @@ int synthesisCallback(short* waveData, int sampleCount, espeak_EVENT* event) {
 		int e2 = pa_simple_drain(pulseAudio, &error);
 	}
 }
+void cleanUp( Pix *image){
+	pixDestroy(&image);
+	}
 
-void cleanupMemory(char *outText, Pix *image) {
+void cleanupMemory(char *outText) {
 	// Destroy used object and release memory
 	api->End();
 	delete[] outText;
-	pixDestroy(&image);
 	if (pulseAudio)
 		pa_simple_free(pulseAudio);
 }
@@ -134,16 +136,16 @@ Mat deskew(double angle, Mat img){
     if (*it)
       points.push_back(it.pos());
  
-  cv::RotatedRect box = cv::minAreaRect(cv::Mat(points));
-  cv::Mat rot_mat = cv::getRotationMatrix2D(box.center, angle, 1);
-  cv::Mat rotated;
-  cv::warpAffine(img, rotated, rot_mat, img.size(), cv::INTER_CUBIC);
+  RotatedRect box = minAreaRect(cv::Mat(points));
+  Mat rot_mat = getRotationMatrix2D(box.center, angle, 1);
+  Mat rotated;
+  warpAffine(img, rotated, rot_mat, img.size(), INTER_CUBIC);
   
-  cv::Size box_size = box.size;
+  Size box_size = box.size;
   if (box.angle < -45.)
     std::swap(box_size.width, box_size.height);
-  cv::Mat cropped;
-  cv::getRectSubPix(rotated, box_size, box.center, cropped);
+  Mat cropped;
+  getRectSubPix(rotated, box_size, box.center, cropped);
    
   bitwise_not(cropped, cropped);
  
@@ -152,13 +154,11 @@ Mat deskew(double angle, Mat img){
 
 double compute_skew(Mat src) {
    
-   //AdaptiveThreshold(src,src,255,ADAPTIVE_THRESH_GAUSSIAN_C,CV_THRESH_BINARY,13,0);
-
    cv::Size size = src.size();
-   cv::bitwise_not(src, src);
+   bitwise_not(src, src);
    std::vector<cv::Vec4i> lines;
-   cv::HoughLinesP(src, lines, 1, CV_PI/180, 100, size.width / 2.f, 20);
-   cv::Mat disp_lines(size, CV_8UC1, cv::Scalar(0, 0, 0));
+   HoughLinesP(src, lines, 1, CV_PI/180, 100, size.width / 2.f, 20);
+   Mat disp_lines(size, CV_8UC1, cv::Scalar(0, 0, 0));
    double angle = 0.;
    unsigned nb_lines = lines.size();
    for (unsigned i = 0; i < nb_lines; ++i) {
@@ -172,14 +172,18 @@ double compute_skew(Mat src) {
   return angle * 180 / CV_PI;
 }
 
-void imageProcessing(char* argv[]){
-	Mat src = imread(argv[1], 0);
-	// convert to binary
-	threshold(src, src, 127, 255, cv::THRESH_BINARY);
+Mat imageProcessing(char* fileName){
+	Mat src = imread(fileName, 0);
+	// convert to binary ADAPTIVE_THRESH_GAUSSIAN_C or ADAPTIVE_THRESH_MEAN_C
+	adaptiveThreshold(src,src,255,ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY,11,5);
+	//threshold(src, src, 127, 255, cv::THRESH_BINARY);
+    return src;
    
-	double degrees = compute_skew(src);
-	Mat result= deskew(degrees, src);
-    imwrite( argv[2], result );	
+	//double degrees = compute_skew(src);
+	//if((0.00 < degrees < 1.00 )|| (0.00 > degrees > -1.00))
+		//return src;
+	//Mat result= deskew(-15.00, src);
+    //return result;	
 	}
 
 string diacritizeText(string text){
@@ -193,20 +197,31 @@ string diacritizeText(string text){
     return os.str();
 	}
 
-void imageToSpeech(Pix *image){
+Pix* matToPix(Mat src){
+	Pix *image = pixCreate(src.size().width, src.size().height, 8);
+
+	for(int i=0; i<src.rows; i++) 
+		for(int j=0; j<src.cols; j++) 
+			pixSetPixel(image, j,i, (l_uint32) src.at<uchar>(i,j));
+	return image;
+	}
+
+void imageToSpeech(Mat sub){
 	
-	api->SetImage(image);
+	api->SetImage((uchar*)sub.data, sub.size().width, sub.size().height, 
+	sub.channels(), sub.step1());
+	//api->SetImage(image);
 	char *text = api->GetUTF8Text();
     if(strlen(text) > 0){
     string textWithDiactr = diacritizeText(std::string(text));
-    printf("\n%s", textWithDiactr);
+    printf("\n%s", textWithDiactr.c_str());
 	
 	espeak_POSITION_TYPE positionType = POS_WORD;
 	unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO;
 	espeak_Synth(textWithDiactr.c_str(), textWithDiactr.size(), position, 
 	positionType, endPosition, flags,	NULL, userData);
 	espeak_Synchronize();
-    cleanupMemory(text, image);
+    cleanupMemory(text);
 	}
 }
 
@@ -214,22 +229,20 @@ int main(int argc, char* argv[]) {
 
 	setupPulseAudio();
 	wiringPiSetup();
-	//setupRaspicam();
+	setupRaspicam();
 	
-	//setupTesseract();
-	//setupEspeak();
+	setupTesseract();
+	setupEspeak();
 	
 	pinMode(15, INPUT);
 	int status = digitalRead(15);
 	printf("Pin Input = %d\n", status);
 
-	//captureImage();
-	//imageProcessing(argv);
-  
-    //Pix *image = pixRead(argv[1]);
-	//imageToSpeech(image);
+	captureImage();
+	Mat enhancedImage = imageProcessing(argv[1]);
+    imageToSpeech(enhancedImage);
 
-	//espeak_Terminate();
+	espeak_Terminate();
     //Camera.release();
 	//delete data;
 	return 0;
