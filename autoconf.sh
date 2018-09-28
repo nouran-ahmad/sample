@@ -77,7 +77,7 @@ cp ./mbrola/ar2 -r /usr/share/mbrola
 
 echo installing raspicam lib:
 echo ==============================
-cd ./dependencies
+cd ./dependencies/raspicam-0.1.6
 sudo apt-get install unzip
 unzip raspicam-0.1.6.zip
 

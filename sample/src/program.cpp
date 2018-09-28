@@ -9,7 +9,7 @@
 #include <pulse/sample.h>
 #include <iostream>
 #include <fstream>
-#include <raspicam/raspicam.h>
+#include <raspicam/raspicam_cv.h>
 #include <ctime>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
@@ -17,10 +17,10 @@
 #include <curlpp/Options.hpp>
 #include <curlpp/Easy.hpp>
 #include <wiringPi.h> 
-
+ 
 tesseract::TessBaseAPI *api;
-raspicam::RaspiCam Camera; 
-
+raspicam::RaspiCam_Cv Camera;
+ 
 int Buflength = 10000, Options = 0;
 void* userData;
 t_espeak_callback *SynthCallback;
@@ -90,14 +90,14 @@ void setupEspeak() {
 }
 
 void setupRaspicam(){
-	
-	Camera.setFormat(raspicam::RASPICAM_FORMAT_GRAY);
+	Camera.set( CV_CAP_PROP_FORMAT, CV_8UC1 );
+	//Camera.setFormat(raspicam::RASPICAM_FORMAT_GRAY);
 	//Camera.setEncoding ( raspicam::RASPICAM_ENCODING_PNG );
-	Camera.setWidth(640);
-    Camera.setHeight(480);
-    Camera.setBrightness(70);
-	Camera.setSharpness(100);
-    Camera.setContrast(100);
+	//Camera.setWidth(640);
+    //Camera.setHeight(480);
+    //Camera.setBrightness(70);
+	//Camera.setSharpness(100);
+    //Camera.setContrast(100);
 	
 	if ( !Camera.open() ) {
 		printf("Error opening camera");
@@ -107,25 +107,6 @@ void setupRaspicam(){
 	sleep(1);    
 }
 
-void captureImage(){
-	printf("==== start capturing image ====\n");
-	
-	Camera.startCapture();
-	if(!Camera.grab()) {
-	    printf("Camera buffer grabbing failed!\n");
-	}
-	
-	int imageSize = Camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_GRAY);
-	unsigned char *data=new unsigned char[imageSize];
-	Camera.retrieve(data);
-	
-	std::ofstream outFile("test.pgm",std::ios::binary);
-    outFile<<"P5\n"<<Camera.getWidth() <<" "<<Camera.getHeight() <<" 255\n";
-    outFile.write(( char* )data,imageSize);
-	outFile.close();
-	printf("==== image saved to test.pgm ====\n");
-	
-	}
 
 Mat deskew(double angle, Mat img){
   
@@ -172,8 +153,19 @@ double compute_skew(Mat src) {
   return angle * 180 / CV_PI;
 }
 
-Mat imageProcessing(char* fileName){
-	Mat src = imread(fileName, 0);
+
+Mat captureImage(){
+	printf("==== start capturing image ====\n");
+	if(!Camera.grab()) {
+	    printf("Camera buffer grabbing failed!\n");
+	}
+	Mat image;
+	Camera.retrieve(image);
+	return image;
+	}
+
+Mat imageProcessing(Mat src){
+	//Mat src = imread(fileName, 0);
 	// convert to binary ADAPTIVE_THRESH_GAUSSIAN_C or ADAPTIVE_THRESH_MEAN_C
 	adaptiveThreshold(src,src,255,ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY,11,5);
 	//threshold(src, src, 127, 255, cv::THRESH_BINARY);
@@ -206,11 +198,10 @@ Pix* matToPix(Mat src){
 	return image;
 	}
 
-void imageToSpeech(Mat sub){
+void imageToSpeech(Mat img){
 	
-	api->SetImage((uchar*)sub.data, sub.size().width, sub.size().height, 
-	sub.channels(), sub.step1());
-	//api->SetImage(image);
+	api->SetImage((uchar*)img.data, img.size().width, img.size().height, 
+	img.channels(), img.step1());
 	char *text = api->GetUTF8Text();
     if(strlen(text) > 0){
     string textWithDiactr = diacritizeText(std::string(text));
@@ -222,6 +213,7 @@ void imageToSpeech(Mat sub){
 	positionType, endPosition, flags,	NULL, userData);
 	espeak_Synchronize();
     cleanupMemory(text);
+   
 	}
 }
 
@@ -230,20 +222,24 @@ int main(int argc, char* argv[]) {
 	setupPulseAudio();
 	wiringPiSetup();
 	setupRaspicam();
-	
 	setupTesseract();
 	setupEspeak();
 	
-	pinMode(15, INPUT);
-	int status = digitalRead(15);
-	printf("Pin Input = %d\n", status);
-
-	captureImage();
-	Mat enhancedImage = imageProcessing(argv[1]);
-    imageToSpeech(enhancedImage);
-
+	int pinNumber= 16;
+	while(true){
+			pinMode(pinNumber, INPUT);
+			while(int status = digitalRead(pinNumber) != 0){
+			status = digitalRead(pinNumber);
+			printf("Waiting for input = %d\n", status);
+			sleep(1);
+		}
+		
+		Mat image = captureImage();
+		Mat enhancedImage = imageProcessing(image);
+		imageToSpeech(enhancedImage);
+	}
+	
 	espeak_Terminate();
-    //Camera.release();
-	//delete data;
+    Camera.release();
 	return 0;
 }
