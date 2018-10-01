@@ -13,6 +13,7 @@
 #include <ctime>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
+#include <opencv2/stitching/stitcher.hpp>
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Options.hpp>
 #include <curlpp/Easy.hpp>
@@ -211,8 +212,8 @@ void imageToSpeech(Mat img){
 	log<<string(text);
 	log.close();
 	
-    //string textWithDiactr = diacritizeText(string(text));
-    //printf("Mishkal \n%s", textWithDiactr.c_str());
+    string textWithDiactr = diacritizeText(string(text));
+    printf("Mishkal \n%s", textWithDiactr.c_str());
 	
 	espeak_POSITION_TYPE positionType = POS_WORD;
 	unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO;
@@ -222,6 +223,17 @@ void imageToSpeech(Mat img){
 	delete[] text;
 }
 
+Mat combineImages(Mat image1, Mat image2){
+	vector<Mat> imgs;
+	imgs.push_back(image1);
+	imgs.push_back(image2);
+	Mat pano;
+	Stitcher::Mode mode = Stitcher::PANORAMA;
+    Ptr<Stitcher> stitcher = Stitcher::create(mode, false);
+    Stitcher::Status status = stitcher->stitch(imgs, pano);
+    return pano;
+	}
+	
 int main(int argc, char* argv[]) {
 
 	setupPulseAudio();
@@ -240,12 +252,14 @@ int main(int argc, char* argv[]) {
 			sleep(1);
 		}
 		sleep(1);
+		Mat result = combineImages(imread(argv[1]),imread(argv[2]));
+		imwrite(argv[3], result);
 		//Mat enhancedImage = captureImage();
 		//imwrite(argv[1], enhancedImage);
-		Mat enhancedImage = imread(argv[1]);
+		//Mat enhancedImage = imread(argv[1]);
 		//printf("start image pre processing \n");
 		//Mat enhancedImage = imageProcessing(image);
-		imageToSpeech(enhancedImage);
+		//imageToSpeech(enhancedImage);
 	//}
 	freeApi();
     Camera.release();
