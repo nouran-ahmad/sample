@@ -44,10 +44,9 @@ void cleanUp( Pix *image){
 	pixDestroy(&image);
 	}
 
-void cleanupMemory(char *outText) {
-	// Destroy used object and release memory
+void freeApi() {
+	espeak_Terminate();
 	api->End();
-	delete[] outText;
 	if (pulseAudio)
 		pa_simple_free(pulseAudio);
 }
@@ -55,9 +54,8 @@ void cleanupMemory(char *outText) {
 void setupTesseract() {
 	api = new tesseract::TessBaseAPI();
 	// Initialize tesseract-ocr with Arabic, with specifying tessdata path
-	printf("Start tesseract Initialize:\n");
-	if (api->Init("/home/pi/Desktop/project/dependencies/tesseract/tessdata",
-			"ara")) {
+	printf("Tesseract Init:\n");
+	if (api->Init("/home/pi/Desktop/project/dependencies/tesseract/tessdata","ara")) {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
 	}
@@ -91,20 +89,19 @@ void setupEspeak() {
 
 void setupRaspicam(){
 	Camera.set( CV_CAP_PROP_FORMAT, CV_8UC1 );
-	//Camera.setFormat(raspicam::RASPICAM_FORMAT_GRAY);
+	//Camera.set( CV_CAP_PROP_CONTRAST, 60 );
 	//Camera.setEncoding ( raspicam::RASPICAM_ENCODING_PNG );
 	//Camera.setWidth(640);
     //Camera.setHeight(480);
     //Camera.setBrightness(70);
 	//Camera.setSharpness(100);
-    //Camera.setContrast(100);
 	
 	if ( !Camera.open() ) {
 		printf("Error opening camera");
 		exit(1);
 	}
 	
-	sleep(1);    
+	sleep(3);    
 }
 
 
@@ -155,7 +152,7 @@ double compute_skew(Mat src) {
 
 
 Mat captureImage(){
-	printf("==== start capturing image ====\n");
+	printf("==== capturing image ====\n");
 	if(!Camera.grab()) {
 	    printf("Camera buffer grabbing failed!\n");
 	}
@@ -199,22 +196,30 @@ Pix* matToPix(Mat src){
 	}
 
 void imageToSpeech(Mat img){
-	
+	printf("image To speech \n");
 	api->SetImage((uchar*)img.data, img.size().width, img.size().height, 
 	img.channels(), img.step1());
 	char *text = api->GetUTF8Text();
-    if(strlen(text) > 0){
-    string textWithDiactr = diacritizeText(std::string(text));
-    printf("\n%s", textWithDiactr.c_str());
+	printf("OCR \n%s", text);
+    if(strlen(text) == 0)
+    {
+		printf("No text detected\n");
+		return;
+	}
+	ofstream log;
+	log.open("../img/ocrlog.txt");
+	log<<string(text);
+	log.close();
+	
+    //string textWithDiactr = diacritizeText(string(text));
+    //printf("Mishkal \n%s", textWithDiactr.c_str());
 	
 	espeak_POSITION_TYPE positionType = POS_WORD;
 	unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO;
-	espeak_Synth(textWithDiactr.c_str(), textWithDiactr.size(), position, 
-	positionType, endPosition, flags,	NULL, userData);
-	espeak_Synchronize();
-    cleanupMemory(text);
-   
-	}
+	//espeak_Synth(textWithDiactr.c_str(), textWithDiactr.size(), position, 
+	//positionType, endPosition, flags,	NULL, userData);
+	//espeak_Synchronize();
+	delete[] text;
 }
 
 int main(int argc, char* argv[]) {
@@ -225,21 +230,24 @@ int main(int argc, char* argv[]) {
 	setupTesseract();
 	setupEspeak();
 	
-	int pinNumber= 16;
-	while(true){
-			pinMode(pinNumber, INPUT);
+	int pinNumber = 16;
+	pinMode(pinNumber, INPUT);
+	//while(true){
+			
 			while(int status = digitalRead(pinNumber) != 0){
 			status = digitalRead(pinNumber);
 			printf("Waiting for input = %d\n", status);
 			sleep(1);
 		}
-		
-		Mat image = captureImage();
-		Mat enhancedImage = imageProcessing(image);
+		sleep(1);
+		//Mat enhancedImage = captureImage();
+		//imwrite(argv[1], enhancedImage);
+		Mat enhancedImage = imread(argv[1]);
+		//printf("start image pre processing \n");
+		//Mat enhancedImage = imageProcessing(image);
 		imageToSpeech(enhancedImage);
-	}
-	
-	espeak_Terminate();
+	//}
+	freeApi();
     Camera.release();
 	return 0;
 }
