@@ -13,6 +13,7 @@ sudo apt-get install libpango1.0-dev
 sudo apt-get install libcairo2-dev
 sudo apt-get install libleptonica-dev
 
+cd /home/pi/Desktop/project/dependencies
 
 git clone https://github.com/tesseract-ocr/tesseract.git
 cd ./tesseract
@@ -24,7 +25,7 @@ sudo make install
 sudo ldconfig
 make training
 sudo make install training-install
-
+cd ..
 
 echo installing leptonica lib:
 echo ==============================
@@ -75,9 +76,22 @@ sudo mkdir /usr/share/mbrola
 cp ./mbrola/ar1 -r /usr/share/mbrola
 cp ./mbrola/ar2 -r /usr/share/mbrola
 
+echo installing opencv:
+================
+git clone https://github.com/opencv/opencv.git
+cd ./opencv
+git reset --hard 68942affdbc4677aa845bc4307d4752182324a0e
+mkdir build
+cd build
+cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
+make
+sudo make install
+sudo ldconfig
+cd ../..
+
 echo installing raspicam lib:
 echo ==============================
-cd ./dependencies/raspicam-0.1.6
+cd ./raspicam-0.1.6
 sudo apt-get install unzip
 unzip raspicam-0.1.6.zip
 

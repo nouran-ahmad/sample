@@ -13,7 +13,7 @@
 #include <ctime>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
-#include <opencv2/stitching/stitcher.hpp>
+#include <opencv2/stitching.hpp>
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Options.hpp>
 #include <curlpp/Easy.hpp>
@@ -225,12 +225,19 @@ void imageToSpeech(Mat img){
 
 Mat combineImages(Mat image1, Mat image2){
 	vector<Mat> imgs;
+    printf("imgs push\n");
 	imgs.push_back(image1);
 	imgs.push_back(image2);
 	Mat pano;
-	Stitcher::Mode mode = Stitcher::PANORAMA;
+	Stitcher::Mode mode = Stitcher::SCANS;//PANORAMA;
+    printf("create stiticher\n");
     Ptr<Stitcher> stitcher = Stitcher::create(mode, false);
+    printf("before stitiching\n");
     Stitcher::Status status = stitcher->stitch(imgs, pano);
+      if (status != Stitcher::OK)
+    {
+        cout << "Can't stitch images, error code = " << int(status) << endl;
+    }
     return pano;
 	}
 	
@@ -246,13 +253,15 @@ int main(int argc, char* argv[]) {
 	pinMode(pinNumber, INPUT);
 	//while(true){
 			
-			while(int status = digitalRead(pinNumber) != 0){
-			status = digitalRead(pinNumber);
-			printf("Waiting for input = %d\n", status);
-			sleep(1);
-		}
+			//while(int status = digitalRead(pinNumber) != 0){
+			//status = digitalRead(pinNumber);
+			//printf("Waiting for input = %d\n", status);
+			//sleep(1);
+		//}
 		sleep(1);
-		Mat result = combineImages(imread(argv[1]),imread(argv[2]));
+		Mat img1 = imread(argv[1]);
+		Mat img2 = imread(argv[2]);
+		Mat result = combineImages(img1,img2);
 		imwrite(argv[3], result);
 		//Mat enhancedImage = captureImage();
 		//imwrite(argv[1], enhancedImage);
