@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/stitching.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Options.hpp>
 #include <curlpp/Easy.hpp>
@@ -81,10 +82,10 @@ void setupEspeak() {
 	espeak_AUDIO_OUTPUT output = AUDIO_OUTPUT_RETRIEVAL;
 	espeak_Initialize(output, Buflength, "/usr/local/share/espeak-ng-data",
 			Options);
-	espeak_SetVoiceByName("mb-ar1");
 	espeak_SetParameter(espeakVOICETYPE, 1, 0);
-	espeak_SetParameter(espeakPITCH, 40, 0);
+	espeak_SetParameter(espeakPITCH, 20, 0);
 	espeak_SetParameter(espeakRATE, 110, 0);
+	espeak_SetVoiceByName("mb-ar2");
 	espeak_SetSynthCallback(synthesisCallback);
 }
 
@@ -211,25 +212,26 @@ void imageToSpeech(Mat img){
 	log.open("../img/ocrlog.txt");
 	log<<string(text);
 	log.close();
-	
-    string textWithDiactr = diacritizeText(string(text));
-    printf("Mishkal \n%s", textWithDiactr.c_str());
+	string textWithDiacr = string(text);
+    //string textWithDiacr = diacritizeText(string(text));
+    //printf("Mishkal \n%s", textWithDiacr.c_str());
 	
 	espeak_POSITION_TYPE positionType = POS_WORD;
 	unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO;
-	//espeak_Synth(textWithDiactr.c_str(), textWithDiactr.size(), position, 
-	//positionType, endPosition, flags,	NULL, userData);
-	//espeak_Synchronize();
+	espeak_Synth(textWithDiacr.c_str(), textWithDiacr.size(), position, 
+	positionType, endPosition, flags,	NULL, userData);
+	espeak_Synchronize();
 	delete[] text;
 }
 
-Mat combineImages(Mat image1, Mat image2){
+Mat combineImages(Mat image1, Mat image2, Mat image3){
 	vector<Mat> imgs;
     printf("imgs push\n");
-	imgs.push_back(image1);
+	imgs.push_back(image3);
 	imgs.push_back(image2);
+	imgs.push_back(image1);
 	Mat pano;
-	Stitcher::Mode mode = Stitcher::SCANS;//PANORAMA;
+	Stitcher::Mode mode = Stitcher::PANORAMA;
     printf("create stiticher\n");
     Ptr<Stitcher> stitcher = Stitcher::create(mode, false);
     printf("before stitiching\n");
@@ -259,16 +261,17 @@ int main(int argc, char* argv[]) {
 			//sleep(1);
 		//}
 		sleep(1);
-		Mat img1 = imread(argv[1]);
-		Mat img2 = imread(argv[2]);
-		Mat result = combineImages(img1,img2);
-		imwrite(argv[3], result);
+		//Mat img1 = imread(argv[1]);
+		//Mat img2 = imread(argv[2]);
+		//Mat img3 = imread(argv[3]);
+		//Mat result = combineImages(img1,img2, img3);
+		//imwrite(argv[4], result);
 		//Mat enhancedImage = captureImage();
 		//imwrite(argv[1], enhancedImage);
-		//Mat enhancedImage = imread(argv[1]);
-		//printf("start image pre processing \n");
+		Mat enhancedImage = imread(argv[1]);
+		printf("start image pre processing \n");
 		//Mat enhancedImage = imageProcessing(image);
-		//imageToSpeech(enhancedImage);
+		imageToSpeech(enhancedImage);
 	//}
 	freeApi();
     Camera.release();

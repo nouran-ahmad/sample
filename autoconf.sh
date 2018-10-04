@@ -61,6 +61,7 @@ echo cloning and installing espeak-ng:
 echo ==============================
 git clone https://github.com/espeak-ng/espeak-ng.git
 cd ./espeak-ng
+git reset --hard 3ed34d3a74eb69cedcdfa98dbedef4359279d352
 ./autogen.sh
 ./configure 
 make
@@ -68,6 +69,7 @@ sudo make install
 cd ..
 
 echo downloading mbrola binaries:
+echo ==============================
 curl -O http://tcts.fpms.ac.be/synthesis/mbrola/bin/raspberri_pi/mbrola.tgz
 sudo tar -xvzf ./mbrola.tgz -C /usr/local/bin
 
