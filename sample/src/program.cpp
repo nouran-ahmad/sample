@@ -180,12 +180,19 @@ Mat imageProcessing(Mat src){
 string diacritizeText(string text){
 	std::ostringstream os;
     string textUrlEncoded = curlpp::escape(text); 
-    curlpp::options::Url myUrl(std::string("http://127.0.0.1:8080/ajaxGet?resultType=text&text=")+textUrlEncoded+"&action=TashkeelText");
+    string url = string("http://127.0.0.1:8080/ajaxGet?resultType=text&text=")
+    +textUrlEncoded+"&action=TashkeelText&lastmark=0";
+    curlpp::options::Url myUrl(url);
     curlpp::Easy myRequest;
+    
     myRequest.setOpt(myUrl);
     myRequest.perform();  
     os << myRequest;
-    return os.str();
+    string result = os.str();
+    cout<<"\n";
+    cout<<result;
+    cout<<"\n";
+    return result;
 	}
 
 Pix* matToPix(Mat src){
@@ -202,7 +209,6 @@ void imageToSpeech(Mat img){
 	api->SetImage((uchar*)img.data, img.size().width, img.size().height, 
 	img.channels(), img.step1());
 	char *text = api->GetUTF8Text();
-	printf("OCR \n%s", text);
     if(strlen(text) == 0)
     {
 		printf("No text detected\n");
@@ -210,11 +216,11 @@ void imageToSpeech(Mat img){
 	}
 	ofstream log;
 	log.open("../img/ocrlog.txt");
-	log<<string(text);
+	//log<<string(text);
+	//string textWithDiacr = string(text);
+    string textWithDiacr = diacritizeText(string(text));
+    log<<textWithDiacr.c_str();
 	log.close();
-	string textWithDiacr = string(text);
-    //string textWithDiacr = diacritizeText(string(text));
-    //printf("Mishkal \n%s", textWithDiacr.c_str());
 	
 	espeak_POSITION_TYPE positionType = POS_WORD;
 	unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO;
