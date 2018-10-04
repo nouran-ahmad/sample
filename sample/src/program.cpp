@@ -57,7 +57,7 @@ void setupTesseract() {
 	api = new tesseract::TessBaseAPI();
 	// Initialize tesseract-ocr with Arabic, with specifying tessdata path
 	printf("Tesseract Init:\n");
-	if (api->Init("/home/pi/Desktop/project/dependencies/tesseract/tessdata","ara")) {
+	if (api->Init("/home/pi/Desktop/project/sample/dependencies/tesseract/tessdata","ara")) {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
 	}
