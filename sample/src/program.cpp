@@ -216,15 +216,14 @@ void imageToSpeech(Mat img){
 	}
 	ofstream log;
 	log.open("../img/ocrlog.txt");
-	//log<<string(text);
-	//string textWithDiacr = string(text);
-    string textWithDiacr = diacritizeText(string(text));
+	log<<text;
+	string textWithDiacr = diacritizeText(string(text));
     log<<textWithDiacr.c_str();
 	log.close();
 	
 	espeak_POSITION_TYPE positionType = POS_WORD;
 	unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO;
-	espeak_Synth(textWithDiacr.c_str(), textWithDiacr.size(), position, 
+	espeak_Synth(textWithDiacr.c_str(), textWithDiacr.size()+1, position, 
 	positionType, endPosition, flags,	NULL, userData);
 	espeak_Synchronize();
 	delete[] text;
