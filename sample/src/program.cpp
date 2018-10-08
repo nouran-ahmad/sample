@@ -13,7 +13,7 @@
 #include <ctime>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
-#include <opencv2/stitching.hpp>
+//#include <opencv2/stitching.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Options.hpp>
@@ -83,8 +83,7 @@ void setupEspeak() {
 	espeak_Initialize(output, Buflength, "/usr/local/share/espeak-ng-data",
 			Options);
 	espeak_SetParameter(espeakVOICETYPE, 1, 0);
-	espeak_SetParameter(espeakPITCH, 20, 0);
-	espeak_SetParameter(espeakRATE, 110, 0);
+	espeak_SetParameter(espeakRATE, 120, 0);
 	espeak_SetVoiceByName("mb-ar2");
 	espeak_SetSynthCallback(synthesisCallback);
 }
@@ -97,7 +96,8 @@ void setupRaspicam(){
     //Camera.setHeight(480);
     //Camera.setBrightness(70);
 	//Camera.setSharpness(100);
-	
+	Camera.set(CV_CAP_PROP_FRAME_WIDTH, 640);
+	Camera.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
 	if ( !Camera.open() ) {
 		printf("Error opening camera");
 		exit(1);
@@ -164,10 +164,9 @@ Mat captureImage(){
 	}
 
 Mat imageProcessing(Mat src){
-	//Mat src = imread(fileName, 0);
 	// convert to binary ADAPTIVE_THRESH_GAUSSIAN_C or ADAPTIVE_THRESH_MEAN_C
-	adaptiveThreshold(src,src,255,ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY,11,5);
-	//threshold(src, src, 127, 255, cv::THRESH_BINARY);
+	//adaptiveThreshold(src,src,255,ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY,15,5);
+	threshold(src, src, 100, 255, cv::THRESH_BINARY);
     return src;
    
 	//double degrees = compute_skew(src);
@@ -184,14 +183,10 @@ string diacritizeText(string text){
     +textUrlEncoded+"&action=TashkeelText&lastmark=0";
     curlpp::options::Url myUrl(url);
     curlpp::Easy myRequest;
-    
     myRequest.setOpt(myUrl);
     myRequest.perform();  
     os << myRequest;
     string result = os.str();
-    cout<<"\n";
-    cout<<result;
-    cout<<"\n";
     return result;
 	}
 
@@ -204,7 +199,27 @@ Pix* matToPix(Mat src){
 	return image;
 	}
 
-void imageToSpeech(Mat img){
+
+//Mat combineImages(Mat image1, Mat image2, Mat image3){
+	//vector<Mat> imgs;
+    //printf("imgs push\n");
+	//imgs.push_back(image3);
+	//imgs.push_back(image2);
+	//imgs.push_back(image1);
+	//Mat pano;
+	//Stitcher::Mode mode = Stitcher::PANORAMA;
+    //printf("create stiticher\n");
+    //Ptr<Stitcher> stitcher = Stitcher::create(mode, false);
+    //printf("before stitiching\n");
+    //Stitcher::Status status = stitcher->stitch(imgs, pano);
+      //if (status != Stitcher::OK)
+    //{
+        //cout << "Can't stitch images, error code = " << int(status) << endl;
+    //}
+    //return pano;
+	//}
+	
+	void imageToSpeech(Mat img){
 	printf("image To speech \n");
 	api->SetImage((uchar*)img.data, img.size().width, img.size().height, 
 	img.channels(), img.step1());
@@ -216,11 +231,9 @@ void imageToSpeech(Mat img){
 	}
 	ofstream log;
 	log.open("../img/ocrlog.txt");
-	log<<text;
 	string textWithDiacr = diacritizeText(string(text));
     log<<textWithDiacr.c_str();
 	log.close();
-	
 	espeak_POSITION_TYPE positionType = POS_WORD;
 	unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO;
 	espeak_Synth(textWithDiacr.c_str(), textWithDiacr.size()+1, position, 
@@ -229,24 +242,6 @@ void imageToSpeech(Mat img){
 	delete[] text;
 }
 
-Mat combineImages(Mat image1, Mat image2, Mat image3){
-	vector<Mat> imgs;
-    printf("imgs push\n");
-	imgs.push_back(image3);
-	imgs.push_back(image2);
-	imgs.push_back(image1);
-	Mat pano;
-	Stitcher::Mode mode = Stitcher::PANORAMA;
-    printf("create stiticher\n");
-    Ptr<Stitcher> stitcher = Stitcher::create(mode, false);
-    printf("before stitiching\n");
-    Stitcher::Status status = stitcher->stitch(imgs, pano);
-      if (status != Stitcher::OK)
-    {
-        cout << "Can't stitch images, error code = " << int(status) << endl;
-    }
-    return pano;
-	}
 	
 int main(int argc, char* argv[]) {
 
@@ -257,27 +252,29 @@ int main(int argc, char* argv[]) {
 	setupEspeak();
 	
 	int pinNumber = 16;
+	int led = 0;
 	pinMode(pinNumber, INPUT);
+	pinMode(led, OUTPUT);
 	//while(true){
-			
-			//while(int status = digitalRead(pinNumber) != 0){
-			//status = digitalRead(pinNumber);
-			//printf("Waiting for input = %d\n", status);
-			//sleep(1);
-		//}
-		sleep(1);
-		//Mat img1 = imread(argv[1]);
-		//Mat img2 = imread(argv[2]);
-		//Mat img3 = imread(argv[3]);
-		//Mat result = combineImages(img1,img2, img3);
-		//imwrite(argv[4], result);
-		//Mat enhancedImage = captureImage();
-		//imwrite(argv[1], enhancedImage);
-		Mat enhancedImage = imread(argv[1]);
-		printf("start image pre processing \n");
+			digitalWrite(led, LOW);
+			while(int status = digitalRead(pinNumber) != 0){
+			status = digitalRead(pinNumber);
+			printf("Waiting for input = %d\n", status);
+			sleep(1);
+		}
+		//digitalWrite(led, HIGH);
+		//sleep(1);
+		//digitalWrite(led, LOW);
+		Mat image = captureImage();
+		imwrite(argv[1], image);
+		printf("==== image saved====\n");
+		//Mat image = imread(argv[1]);
+		//printf("start image pre processing \n");
 		//Mat enhancedImage = imageProcessing(image);
-		imageToSpeech(enhancedImage);
+		//imwrite(argv[2], enhancedImage);
+		imageToSpeech(image);
 	//}
+	//digitalWrite(led, LOW);
 	freeApi();
     Camera.release();
 	return 0;
