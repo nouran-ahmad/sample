@@ -61,6 +61,9 @@ void setupTesseract() {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
 	}
+	//PSM_AUTO_OSD 		PSM_SINGLE_LINE 
+	//PSM_SPARSE_TEXT 	PSM_RAW_LINE PSM_AUTO
+	api->SetPageSegMode(tesseract::PSM_AUTO_OSD);
 }
 
 void setupPulseAudio() {
@@ -89,7 +92,7 @@ void setupEspeak() {
 }
 
 void setupRaspicam(){
-	Camera.set( CV_CAP_PROP_FORMAT, CV_8UC1 );
+	Camera.set( CV_CAP_PROP_FORMAT, CV_8UC1 ); //gray
 	//Camera.set( CV_CAP_PROP_CONTRAST, 60 );
 	//Camera.setEncoding ( raspicam::RASPICAM_ENCODING_PNG );
 	//Camera.setWidth(640);
@@ -154,7 +157,7 @@ double compute_skew(Mat src) {
 
 
 Mat captureImage(){
-	printf("==== capturing image ====\n");
+	printf("====> capturing image\n");
 	if(!Camera.grab()) {
 	    printf("Camera buffer grabbing failed!\n");
 	}
@@ -220,23 +223,25 @@ Pix* matToPix(Mat src){
 	//}
 	
 	void imageToSpeech(Mat img){
-	printf("image To speech \n");
+	printf("===> image To speech \n");
 	api->SetImage((uchar*)img.data, img.size().width, img.size().height, 
 	img.channels(), img.step1());
 	char *text = api->GetUTF8Text();
+	string resultText;
     if(strlen(text) == 0)
     {
 		printf("No text detected\n");
-		return;
-	}
+		resultText = "لا يوجد نص";
+	}else {
 	ofstream log;
 	log.open("../img/ocrlog.txt");
-	string textWithDiacr = diacritizeText(string(text));
-    log<<textWithDiacr.c_str();
+	resultText = diacritizeText(string(text));
+    log<<resultText.c_str();
 	log.close();
+	}
 	espeak_POSITION_TYPE positionType = POS_WORD;
 	unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO;
-	espeak_Synth(textWithDiacr.c_str(), textWithDiacr.size()+1, position, 
+	espeak_Synth(resultText.c_str(), resultText.size()+1, position, 
 	positionType, endPosition, flags,	NULL, userData);
 	espeak_Synchronize();
 	delete[] text;
@@ -255,26 +260,23 @@ int main(int argc, char* argv[]) {
 	int led = 0;
 	pinMode(pinNumber, INPUT);
 	pinMode(led, OUTPUT);
-	//while(true){
+	while(true){
 			digitalWrite(led, LOW);
 			while(int status = digitalRead(pinNumber) != 0){
 			status = digitalRead(pinNumber);
-			printf("Waiting for input = %d\n", status);
+			printf("====> Waiting for input = %d\n", status);
 			sleep(1);
 		}
 		//digitalWrite(led, HIGH);
-		//sleep(1);
-		//digitalWrite(led, LOW);
+		sleep(3);
 		Mat image = captureImage();
 		imwrite(argv[1], image);
-		printf("==== image saved====\n");
+		printf("====> image saved\n");
 		//Mat image = imread(argv[1]);
-		//printf("start image pre processing \n");
 		//Mat enhancedImage = imageProcessing(image);
 		//imwrite(argv[2], enhancedImage);
 		imageToSpeech(image);
-	//}
-	//digitalWrite(led, LOW);
+	}
 	freeApi();
     Camera.release();
 	return 0;
