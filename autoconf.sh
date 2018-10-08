@@ -3,17 +3,11 @@ echo installing tesseract:
 echo ==============================
 
 sudo apt-get install pkg-config
-sudo apt-get install libpng-dev
-sudo apt-get install libjpeg8-dev
-sudo apt-get install libtiff5-dev
-sudo apt-get install zlib1g-dev
+sudo apt-get install libpng-dev libjpeg8-dev install libtiff5-dev zlib1g-dev
 
-sudo apt-get install libicu-dev
-sudo apt-get install libpango1.0-dev
-sudo apt-get install libcairo2-dev
-sudo apt-get install libleptonica-dev
+sudo apt-get install libicu-dev libpango1.0-dev libcairo2-dev libleptonica-dev
 
-cd /home/pi/Desktop/project/dependencies
+cd /home/pi/Desktop/project/sample/dependencies
 
 git clone https://github.com/tesseract-ocr/tesseract.git
 cd ./tesseract
