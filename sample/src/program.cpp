@@ -61,9 +61,10 @@ void setupTesseract() {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
 	}
+	// PSM_AUTO_OSD
 	//PSM_AUTO_OSD 		PSM_SINGLE_LINE 
 	//PSM_SPARSE_TEXT 	PSM_RAW_LINE PSM_AUTO
-	api->SetPageSegMode(tesseract::PSM_AUTO_OSD);
+	api->SetPageSegMode(tesseract::PSM_SPARSE_TEXT);
 }
 
 void setupPulseAudio() {
@@ -135,7 +136,30 @@ Mat deskew(double angle, Mat img){
   return cropped;
   }
 
-double compute_skew(Mat src) {
+double compute_skew(Mat img) {
+   
+   cv::Size size = img.size();
+   bitwise_not(img, img);
+   
+   //Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 3));
+   //cv::erode(img, img, element);
+   std::vector<cv::Point> points;
+   Mat_<uchar>::iterator it = img.begin<uchar>();
+   Mat_<uchar>::iterator end = img.end<uchar>();
+   for (; it != end; ++it)
+     if (*it)
+       points.push_back(it.pos());
+   
+   RotatedRect box = cv::minAreaRect(cv::Mat(points));
+   double angle = box.angle;
+   if (angle < -45.)
+     angle += 90.;
+     
+   printf("skew angle in degrees: %f \n", angle  );
+   return angle;
+}
+
+double compute_skewHLT(Mat src) {
    
    cv::Size size = src.size();
    bitwise_not(src, src);
@@ -170,11 +194,11 @@ Mat imageProcessing(Mat src){
 	// convert to binary ADAPTIVE_THRESH_GAUSSIAN_C or ADAPTIVE_THRESH_MEAN_C
 	//adaptiveThreshold(src,src,255,ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY,15,5);
 	threshold(src, src, 100, 255, cv::THRESH_BINARY);
-    return src;
+    //return src;
    
-	//double degrees = compute_skew(src);
+	double degrees = compute_skew(src);
 	//if((0.00 < degrees < 1.00 )|| (0.00 > degrees > -1.00))
-		//return src;
+		return src;
 	//Mat result= deskew(-15.00, src);
     //return result;	
 	}
@@ -252,32 +276,29 @@ int main(int argc, char* argv[]) {
 
 	setupPulseAudio();
 	wiringPiSetup();
-	setupRaspicam();
+	//setupRaspicam();
 	setupTesseract();
 	setupEspeak();
 	
 	int pinNumber = 16;
 	int led = 0;
 	pinMode(pinNumber, INPUT);
-	pinMode(led, OUTPUT);
-	while(true){
-			digitalWrite(led, LOW);
-			while(int status = digitalRead(pinNumber) != 0){
-			status = digitalRead(pinNumber);
-			printf("====> Waiting for input = %d\n", status);
-			sleep(1);
-		}
-		//digitalWrite(led, HIGH);
-		sleep(3);
-		Mat image = captureImage();
-		imwrite(argv[1], image);
+	//while(true){
+			//while(int status = digitalRead(pinNumber) != 0){
+			//status = digitalRead(pinNumber);
+			//printf("====> Waiting for input = %d\n", status);
+			//sleep(1);
+		//}
+		//sleep(3);
+		//Mat image = captureImage();
+		//imwrite(argv[1], image);
 		printf("====> image saved\n");
-		//Mat image = imread(argv[1]);
-		//Mat enhancedImage = imageProcessing(image);
-		//imwrite(argv[2], enhancedImage);
-		imageToSpeech(image);
-	}
+		Mat image = imread(argv[1]);
+		Mat enhancedImage = imageProcessing(image);
+		imwrite(argv[2], enhancedImage);
+		//imageToSpeech(image);
+	//}
 	freeApi();
-    Camera.release();
+    //Camera.release();
 	return 0;
 }
