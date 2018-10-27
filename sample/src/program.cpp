@@ -121,6 +121,7 @@ Mat deskew(double angle, Mat img){
       points.push_back(it.pos());
  
   RotatedRect box = minAreaRect(cv::Mat(points));
+  
   Mat rot_mat = getRotationMatrix2D(box.center, angle, 1);
   Mat rotated;
   warpAffine(img, rotated, rot_mat, img.size(), INTER_CUBIC);
@@ -192,11 +193,12 @@ Mat captureImage(){
 
 Mat imageProcessing(Mat src){
 	// convert to binary ADAPTIVE_THRESH_GAUSSIAN_C or ADAPTIVE_THRESH_MEAN_C
-	//adaptiveThreshold(src,src,255,ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY,15,5);
-	threshold(src, src, 100, 255, cv::THRESH_BINARY);
+	adaptiveThreshold(src, src, 255,ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY,15,5);
+	bitwise_not(src, src);
+	//threshold(src, src, 150, 255, cv::THRESH_BINARY);
     //return src;
-   
-	double degrees = compute_skew(src);
+    
+	//double degrees = compute_skew(src);
 	//if((0.00 < degrees < 1.00 )|| (0.00 > degrees > -1.00))
 		return src;
 	//Mat result= deskew(-15.00, src);
@@ -293,7 +295,7 @@ int main(int argc, char* argv[]) {
 		//Mat image = captureImage();
 		//imwrite(argv[1], image);
 		printf("====> image saved\n");
-		Mat image = imread(argv[1]);
+		Mat image = imread(argv[1], cv::IMREAD_GRAYSCALE);
 		Mat enhancedImage = imageProcessing(image);
 		imwrite(argv[2], enhancedImage);
 		//imageToSpeech(image);
