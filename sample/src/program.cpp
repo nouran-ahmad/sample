@@ -11,6 +11,7 @@
 #include <fstream>
 #include <raspicam/raspicam_cv.h>
 #include <ctime>
+#include <chrono>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
 //#include <opencv2/stitching.hpp>
@@ -42,9 +43,6 @@ int synthesisCallback(short* waveData, int sampleCount, espeak_EVENT* event) {
 		int e2 = pa_simple_drain(pulseAudio, &error);
 	}
 }
-void cleanUp( Pix *image){
-	pixDestroy(&image);
-	}
 
 void freeApi() {
 	espeak_Terminate();
@@ -94,12 +92,6 @@ void setupEspeak() {
 
 void setupRaspicam(){
 	Camera.set( CV_CAP_PROP_FORMAT, CV_8UC1 ); //gray
-	//Camera.set( CV_CAP_PROP_CONTRAST, 60 );
-	//Camera.setEncoding ( raspicam::RASPICAM_ENCODING_PNG );
-	//Camera.setWidth(640);
-    //Camera.setHeight(480);
-    //Camera.setBrightness(70);
-	//Camera.setSharpness(100);
 	Camera.set(CV_CAP_PROP_FRAME_WIDTH, 640);
 	Camera.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
 	if ( !Camera.open() ) {
@@ -158,26 +150,6 @@ double compute_skew(Mat img) {
      
    printf("skew angle in degrees: %f \n", angle  );
    return angle;
-}
-
-double compute_skewHLT(Mat src) {
-   
-   cv::Size size = src.size();
-   bitwise_not(src, src);
-   std::vector<cv::Vec4i> lines;
-   HoughLinesP(src, lines, 1, CV_PI/180, 100, size.width / 2.f, 20);
-   Mat disp_lines(size, CV_8UC1, cv::Scalar(0, 0, 0));
-   double angle = 0.;
-   unsigned nb_lines = lines.size();
-   for (unsigned i = 0; i < nb_lines; ++i) {
-        cv::line(disp_lines, cv::Point(lines[i][0], lines[i][1]),
-                 cv::Point(lines[i][2], lines[i][3]), cv::Scalar(255, 0 ,0));
-        angle += atan2((double)lines[i][3] - lines[i][1],
-                       (double)lines[i][2] - lines[i][0]);
-    }
-  angle /= nb_lines; // mean angle, in radians.
-  printf("skew angle in degrees: %f \n", angle * 180 / CV_PI );
-  return angle * 180 / CV_PI;
 }
 
 
@@ -248,28 +220,45 @@ Pix* matToPix(Mat src){
     //return pano;
 	//}
 	
+	string getResultText(char *text){
+		string resultText;
+		if(strlen(text) == 0)
+		{
+			printf("No text detected\n");
+			resultText = "لا يوجد نص";
+		}else {
+			ofstream log;
+			log.open("../img/ocrlog.txt");
+			resultText = diacritizeText(string(text));
+			log<<resultText.c_str();
+			log.close();
+		}
+	return resultText;
+	}
+	
 	void imageToSpeech(Mat img){
 	printf("===> image To speech \n");
+	auto start = std::chrono::system_clock::now();
 	api->SetImage((uchar*)img.data, img.size().width, img.size().height, 
 	img.channels(), img.step1());
 	char *text = api->GetUTF8Text();
-	string resultText;
-    if(strlen(text) == 0)
-    {
-		printf("No text detected\n");
-		resultText = "لا يوجد نص";
-	}else {
-	ofstream log;
-	log.open("../img/ocrlog.txt");
-	resultText = diacritizeText(string(text));
-    log<<resultText.c_str();
-	log.close();
-	}
+	auto ocrEnd = std::chrono::system_clock::now();
+	chrono::duration<double> diff = ocrEnd - start;
+	cout<<"response time is "<< diff.count()<< "s\n";
+	
+	string resultText = string(text);
+	//string resultText = getResultText(text);
+		
 	espeak_POSITION_TYPE positionType = POS_WORD;
 	unsigned int position = 0, endPosition = 0, flags = espeakCHARS_AUTO;
 	espeak_Synth(resultText.c_str(), resultText.size()+1, position, 
 	positionType, endPosition, flags,	NULL, userData);
 	espeak_Synchronize();
+	
+	auto ttsEnd = std::chrono::system_clock::now();
+	std::chrono::duration<double> totalDuration = ttsEnd - start;
+	cout<<"total response time is "<< totalDuration.count()<< "s\n";
+	
 	delete[] text;
 }
 
@@ -296,9 +285,9 @@ int main(int argc, char* argv[]) {
 		//imwrite(argv[1], image);
 		printf("====> image saved\n");
 		Mat image = imread(argv[1], cv::IMREAD_GRAYSCALE);
-		Mat enhancedImage = imageProcessing(image);
-		imwrite(argv[2], enhancedImage);
-		//imageToSpeech(image);
+		//Mat enhancedImage = imageProcessing(image);
+		//imwrite(argv[2], enhancedImage);
+		imageToSpeech(image);
 	//}
 	freeApi();
     //Camera.release();
