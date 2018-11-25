@@ -14,6 +14,7 @@
 #include <chrono>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
 //#include <opencv2/stitching.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <curlpp/cURLpp.hpp>
@@ -293,3 +294,6 @@ int main(int argc, char* argv[]) {
     //Camera.release();
 	return 0;
 }
+
+
+

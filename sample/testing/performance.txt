@@ -1,3 +1,6 @@
 OCR one word response time = 3.4 - 3.5 Seconds
+OCR one word response time = 2.9 Seconds
+
+OCR one word response time on APTI image = 0.373354 Seconds
 
 Total OCR + TTS + mishkal = 7 seconds
