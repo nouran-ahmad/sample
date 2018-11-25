@@ -35,7 +35,7 @@ void setupTesseract() {
 }
 
 	
-void imageToSpeech(Mat img){
+void ocr(Mat img){
 	auto start = std::chrono::system_clock::now();
 	
 	api->SetImage((uchar*)img.data, img.size().width, img.size().height, 
@@ -44,11 +44,9 @@ void imageToSpeech(Mat img){
 	
 	auto ocrEnd = std::chrono::system_clock::now();
 	chrono::duration<double> diff = ocrEnd - start;
+	//string resultText = string(text);
+	cout<<text<<" response time is "<< diff.count()<< " s\n";
 	
-	cout<<"response time is "<< diff.count()<< "s\n";
-	
-	string resultText = string(text);
-	cout<<resultText;
 	delete[] text;
 }
 
@@ -56,8 +54,11 @@ void imageToSpeech(Mat img){
 int main(int argc, char* argv[]) {
 
 	setupTesseract();
-	Mat image = imread(argv[1], cv::IMREAD_GRAYSCALE);
-	imageToSpeech(image);
+	//for(int i=1;i<=3;i++){
+		Mat image = imread(argv[1], cv::IMREAD_GRAYSCALE);
+		ocr(image);
+		image.release();
+	//}
 	freeApi();
     
 	return 0;
