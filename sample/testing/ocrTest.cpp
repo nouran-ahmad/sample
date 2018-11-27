@@ -58,18 +58,24 @@ int main(int argc, char* argv[]) {
 	//setupTesseract();
 	
 	std::ifstream file("/home/pi/Desktop/project/apti-imgs/ArabicTransparent/xml/set1/Image_12_Arabic Transparent_0.xml");
-	std::string str;
-	std::string file_contents;
+	string str;
+	string file_contents;
 	while (std::getline(file, str))
 	{
 	  file_contents += str;
 	  file_contents.push_back('\n');
 	} 
-	cout<<str;
 	
+	char *cstr = new char[file_contents.length() + 1];
+	strcpy(cstr, file_contents.c_str());
 	xml_document<> doc;    
-	doc.parse<0>(str.c_str());
+	doc.parse<0>(cstr);
 	
+	xml_node<> *node = doc.first_node("wordImage");
+	xml_node<> *content=node->first_node();
+	xml_attribute<> *attr = content->first_attribute();
+	string word=attr->value();
+	cout<<"word is "<<word<<"\n";
 	
 	//for(int i=1;i<=3;i++){
 		//Mat image = imread(argv[1], cv::IMREAD_GRAYSCALE);
