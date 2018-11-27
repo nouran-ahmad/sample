@@ -56,8 +56,9 @@ void ocr(Mat img){
 int main(int argc, char* argv[]) {
 
 	//setupTesseract();
-	
-	std::ifstream file("/home/pi/Desktop/project/apti-imgs/ArabicTransparent/xml/set1/Image_12_Arabic Transparent_0.xml");
+	string basePath = "/home/pi/Desktop/project/apti-imgs/ArabicTransparent";
+	string fileName = basePath +"/xml/set1/Image_12_Arabic Transparent_0.xml"
+	std::ifstream file(fileName);
 	string str;
 	string file_contents;
 	while (std::getline(file, str))
