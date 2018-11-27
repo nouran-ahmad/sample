@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 	cout<<str;
 	
 	xml_document<> doc;    
-	doc.parse<0>(str);
+	doc.parse<0>(str.c_str());
 	
 	
 	//for(int i=1;i<=3;i++){
