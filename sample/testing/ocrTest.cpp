@@ -10,12 +10,14 @@
 #include <chrono>
 #include <unistd.h>
 #include <opencv2/core.hpp>
+#include "rapidxml-1.13/rapidxml.hpp"
  
 tesseract::TessBaseAPI *api;
 void* userData;
 
 using namespace std;
 using namespace cv;
+using namespace rapidxml;
 
 void freeApi() {
 	api->End();
