@@ -108,17 +108,21 @@ int calculateEditCost(string expectedWord, string actual){
 int main(int argc, char* argv[]) {
 	auto startTime = std::chrono::system_clock::now();
 	setupTesseract();
-	string basePath = "/home/pi/Desktop/project/apti-imgs/ArabicTransparent";
+	string basePath = "/home/pi/Desktop/project/apti-imgs/ArabicTransparent/";
+	string size= argv[1];
 	
-	int start=atoi(argv[1]);
-	int end= atoi(argv[2]);
+	string pathXml= basePath+size+"/xml/set1/Image_"+size+"_Arabic Transparent_";
+	string pathImg= basePath+size+"/imgs/set1/Image_"+size+"_Arabic Transparent_";
+	int start=atoi(argv[2]);
+	int end= atoi(argv[3]);
 	
 	unsigned int numberOfChars=0;
 	unsigned int costSum=0;
-	unsigned int wordError=0;
+	double wordError=0;
+	double words=0;
 	for(int i=start; i<end; i++){		
-		string xmlfile = basePath +"/xml/set1/Image_12_Arabic Transparent_"+to_string(i)+".xml";
-		string imgfile = basePath +"/imgs/set1/Image_12_Arabic Transparent_"+to_string(i)+".png";
+		string xmlfile = pathXml+to_string(i)+".xml";
+		string imgfile = pathImg+to_string(i)+".png";
 		
 		cout<<"image "<<i<<"\n";	
 		string expectedWord = getExpectedWord(xmlfile);
@@ -130,13 +134,16 @@ int main(int argc, char* argv[]) {
 		int cost= calculateEditCost(expectedWord, actual);
 		if(cost > 1)
 			wordError++;
+		words++;
 		costSum +=cost;
 	}
 	double totalchars = numberOfChars;
 	double totalCost = costSum;
 	
 	double accuracy= (totalchars - totalCost)/ totalchars * 100;
-	cout<<"word errors= "<<wordError<<"\n";
+	double wordAccuracy= (words - wordError)/ words * 100;
+	
+	cout<<"word accuracy= "<<wordAccuracy<<"\n";
 	cout<<"number of chars= "<<totalchars<<"\n";
 	cout<<"edit cost= "<<totalCost<<"\n";
 	cout<<"accuracy= "<<accuracy<<"\n";
