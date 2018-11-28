@@ -19,9 +19,6 @@ using namespace std;
 using namespace cv;
 using namespace rapidxml;
 
-void freeApi() {
-	api->End();
-}
 
 void setupTesseract() {
 	api = new tesseract::TessBaseAPI();
@@ -30,34 +27,36 @@ void setupTesseract() {
 	if (api->Init("/home/pi/Desktop/project/sample/dependencies/tesseract/tessdata","ara")) {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
-	}
-	//PSM_AUTO_OSD 		PSM_SINGLE_LINE 
+	} 		
+	//PSM_SINGLE_LINE 
 	//PSM_SPARSE_TEXT 	PSM_RAW_LINE PSM_AUTO PSM_SINGLE_WORD
-	api->SetPageSegMode(tesseract::PSM_SPARSE_TEXT);
+	api->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
 }
 
+
+void log (string expectedWord,string actual){
+ofstream log;
+	log.open("./ocrTestlog.txt");
+	log<<expectedWord.c_str()<<"\n";
+	log<<actual.c_str()<<"\n";
+	log.close();
+}
 	
-void ocr(Mat img){
-	auto start = std::chrono::system_clock::now();
+string ocr(Mat img){
+	//auto start = std::chrono::system_clock::now();
 	
 	api->SetImage((uchar*)img.data, img.size().width, img.size().height, 
 	img.channels(), img.step1());
 	char *text = api->GetUTF8Text();
 	
-	auto ocrEnd = std::chrono::system_clock::now();
-	chrono::duration<double> diff = ocrEnd - start;
-	//string resultText = string(text);
-	cout<<text<<" response time is "<< diff.count()<< " s\n";
+	//auto ocrEnd = std::chrono::system_clock::now();
+	//chrono::duration<double> diff = ocrEnd - start;
+	//cout<<text<<" response time is "<< diff.count()<< " s\n";
 	
-	delete[] text;
+	return string(text);
 }
 
-	
-int main(int argc, char* argv[]) {
-
-	//setupTesseract();
-	string basePath = "/home/pi/Desktop/project/apti-imgs/ArabicTransparent";
-	string fileName = basePath +"/xml/set1/Image_12_Arabic Transparent_0.xml"
+string readFile(string fileName){
 	std::ifstream file(fileName);
 	string str;
 	string file_contents;
@@ -66,7 +65,12 @@ int main(int argc, char* argv[]) {
 	  file_contents += str;
 	  file_contents.push_back('\n');
 	} 
-	
+	return file_contents;
+}
+
+string getExpectedWord(string xmlfile){
+
+	string file_contents = readFile(xmlfile);
 	char *cstr = new char[file_contents.length() + 1];
 	strcpy(cstr, file_contents.c_str());
 	xml_document<> doc;    
@@ -75,15 +79,72 @@ int main(int argc, char* argv[]) {
 	xml_node<> *node = doc.first_node("wordImage");
 	xml_node<> *content=node->first_node();
 	xml_attribute<> *attr = content->first_attribute();
-	string word=attr->value();
-	cout<<"word is "<<word<<"\n";
+	string expectedWord = string(attr->value());
+	return expectedWord;	
+}
+
+int calculateEditCost(string expectedWord, string actual){
+	int cost=0;
+	int expWordSize=expectedWord.size();
+	if(actual.compare(expectedWord) != 0){
+		
+		int size = expWordSize;
+		if(expWordSize > actual.size()){
+			size = actual.size(); //assign the smaller size
+			cost += expWordSize - actual.size();
+		}else{
+			//cost += actual.size() - expectedWord.size();
+		}
+		
+		for (int i = 0; i < size; ++i){
+			if(actual[i] != expectedWord[i])
+				cost++;
+		}
+	}
+	return cost;
+}
+
+
+int main(int argc, char* argv[]) {
+	auto startTime = std::chrono::system_clock::now();
+	setupTesseract();
+	string basePath = "/home/pi/Desktop/project/apti-imgs/ArabicTransparent";
 	
-	//for(int i=1;i<=3;i++){
-		//Mat image = imread(argv[1], cv::IMREAD_GRAYSCALE);
-		//ocr(image);
-		//image.release();
-	//}
-	//freeApi();
+	int start=atoi(argv[1]);
+	int end= atoi(argv[2]);
+	
+	unsigned int numberOfChars=0;
+	unsigned int costSum=0;
+	unsigned int wordError=0;
+	for(int i=start; i<end; i++){		
+		string xmlfile = basePath +"/xml/set1/Image_12_Arabic Transparent_"+to_string(i)+".xml";
+		string imgfile = basePath +"/imgs/set1/Image_12_Arabic Transparent_"+to_string(i)+".png";
+		
+		cout<<"image "<<i<<"\n";	
+		string expectedWord = getExpectedWord(xmlfile);
+		Mat image = imread(imgfile, cv::IMREAD_GRAYSCALE);
+		string actual = ocr(image);
+		image.release();
+		
+		numberOfChars +=expectedWord.size();
+		int cost= calculateEditCost(expectedWord, actual);
+		if(cost > 1)
+			wordError++;
+		costSum +=cost;
+	}
+	double totalchars = numberOfChars;
+	double totalCost = costSum;
+	
+	double accuracy= (totalchars - totalCost)/ totalchars * 100;
+	cout<<"word errors= "<<wordError<<"\n";
+	cout<<"number of chars= "<<totalchars<<"\n";
+	cout<<"edit cost= "<<totalCost<<"\n";
+	cout<<"accuracy= "<<accuracy<<"\n";
+	api->End();
+	
+    auto ocrEnd = std::chrono::system_clock::now();
+	chrono::duration<double> diff = ocrEnd - startTime;
+	cout<<"response time is "<< diff.count()<< " s\n";
     
 	return 0;
 }
