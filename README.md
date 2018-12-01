@@ -58,6 +58,8 @@ start pulse Audio server to enable the sound driver in Raspberry Pi
         espeak-ng -v Arabic -s 150 -f out1.txt  --stdout | paplay
 
         espeak-ng -v mb-ar1 -s 110 -f out1.txt  --stdout | paplay
+		
+		espeak-ng -v mb-ar2 -s 120 -f 1.txt  -w 1.wav
 
 - #### espeak code edits: 
 remove new line at mb-ar1 at /usr/local/share/espeak-ng-data/voices/mb
