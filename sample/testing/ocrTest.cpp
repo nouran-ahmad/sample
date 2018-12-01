@@ -108,12 +108,16 @@ int calculateEditCost(string expectedWord, string actual){
 int main(int argc, char* argv[]) {
 	auto startTime = std::chrono::system_clock::now();
 	setupTesseract();
-	string basePath = "/home/pi/Desktop/project/apti-imgs/ArabicTransparent/";
 	string size= argv[1];
+	string set= argv[2];
+	string basePath = "/home/pi/Desktop/project/apti-imgs/SimplifiedArabic/";
+	string pathXml= basePath+size+"/xml/"+set+"/Image_"+size+"_Simplified Arabic_";
+	string pathImg= basePath+size+"/imgs/"+set+"/Image_"+size+"_Simplified Arabic_";
 	
-	string pathXml= basePath+size+"/xml/set1/Image_"+size+"_Arabic Transparent_";
-	string pathImg= basePath+size+"/imgs/set1/Image_"+size+"_Arabic Transparent_";
-	int start=atoi(argv[2]);
+	//string basePath = "/home/pi/Desktop/project/apti-imgs/ArabicTransparent/";
+	//string pathXml= basePath+size+"/xml/set1/Image_"+size+"_Arabic Transparent_";
+	//string pathImg= basePath+size+"/imgs/set1/Image_"+size+"_Arabic Transparent_";
+	int start=0;
 	int end= atoi(argv[3]);
 	
 	unsigned int numberOfChars=0;
