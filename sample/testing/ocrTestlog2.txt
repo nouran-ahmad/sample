@@ -1,0 +1,60 @@
+Diwani Letter size: 12
+word accuracy = 1.715012
+accuracy = 25.721032
+ ================= 
+
+Diwani Letter size: 16
+word accuracy = 2.217870
+accuracy = 26.471519
+ ================= 
+
+Diwani Letter size: 24
+word accuracy = 2.318442
+accuracy = 26.779140
+ ================= 
+
+Tahoma size: 12
+word accuracy = 68.018209% 
+accuracy = 87.001490% 
+ ================= 
+
+Tahoma size: 16
+word accuracy = 66.917214% 
+accuracy = 86.809857% 
+ ================= 
+
+Tahoma size: 24
+word accuracy = 67.483591% 
+accuracy = 86.783725% 
+ ================= 
+
+M Unicode Sara size: 12
+word accuracy = 66.070294% 
+accuracy = 87.953696% 
+ ================= 
+
+M Unicode Sara size: 16
+word accuracy = 65.948550% 
+accuracy = 87.590143% 
+ ================= 
+
+M Unicode Sara size: 24
+word accuracy = 60.443574% 
+accuracy = 86.801146% 
+ ================= 
+
+Traditional Arabic size: 12
+word accuracy = 44.457972% 
+accuracy = 74.095587% 
+ ================= 
+
+Traditional Arabic size: 16
+word accuracy = 51.492695% 
+accuracy = 77.685731% 
+ ================= 
+
+Traditional Arabic size: 24
+word accuracy = 54.695109% 
+accuracy = 79.279312% 
+ ================= 
+

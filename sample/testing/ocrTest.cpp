@@ -104,27 +104,30 @@ int calculateEditCost(string expectedWord, string actual){
 	return cost;
 }
 
+void writeFile (string content){
+ofstream log;
+	log.open("./ocrTestlog2.txt",std::ofstream::out | std::ofstream::app);
+	log<<content.c_str()<<"\n";
+	log.close();
+}
 
 int main(int argc, char* argv[]) {
 	auto startTime = std::chrono::system_clock::now();
 	setupTesseract();
+	string font = "Traditional Arabic";
 	string size= argv[1];
 	string set= argv[2];
-	string basePath = "/home/pi/Desktop/project/apti-imgs/SimplifiedArabic/";
-	string pathXml= basePath+size+"/xml/"+set+"/Image_"+size+"_Simplified Arabic_";
-	string pathImg= basePath+size+"/imgs/"+set+"/Image_"+size+"_Simplified Arabic_";
-	
-	//string basePath = "/home/pi/Desktop/project/apti-imgs/ArabicTransparent/";
-	//string pathXml= basePath+size+"/xml/set1/Image_"+size+"_Arabic Transparent_";
-	//string pathImg= basePath+size+"/imgs/set1/Image_"+size+"_Arabic Transparent_";
-	int start=0;
+	string basePath = "/home/pi/Desktop/project/apti-imgs/"+font+"/";
+	string pathXml= basePath+size+"/xml/"+set+"/Image_"+size+"_"+font+"_";
+	string pathImg= basePath+size+"/imgs/"+set+"/Image_"+size+"_"+font+"_";
+
 	int end= atoi(argv[3]);
 	
 	unsigned int numberOfChars=0;
 	unsigned int costSum=0;
 	double wordError=0;
 	double words=0;
-	for(int i=start; i<end; i++){		
+	for(int i=0; i<end; i++){		
 		string xmlfile = pathXml+to_string(i)+".xml";
 		string imgfile = pathImg+to_string(i)+".png";
 		
@@ -147,9 +150,12 @@ int main(int argc, char* argv[]) {
 	double accuracy= (totalchars - totalCost)/ totalchars * 100;
 	double wordAccuracy= (words - wordError)/ words * 100;
 	
+	string content= font+ " size: "+ size +"\n"+
+	"word accuracy = "+ to_string(wordAccuracy) + "% \n"
+	"accuracy = "+to_string(accuracy)+"% \n ================= \n";
+	writeFile(content);
+	
 	cout<<"word accuracy= "<<wordAccuracy<<"\n";
-	cout<<"number of chars= "<<totalchars<<"\n";
-	cout<<"edit cost= "<<totalCost<<"\n";
 	cout<<"accuracy= "<<accuracy<<"\n";
 	api->End();
 	

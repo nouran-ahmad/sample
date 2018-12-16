@@ -13,8 +13,9 @@
 #include <ctime>
 #include <chrono>
 #include <unistd.h>
-//#include <opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
+//#include <opencv2/stitching.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Options.hpp>
@@ -100,6 +101,57 @@ void setupRaspicam(){
 	sleep(3);    
 }
 
+
+Mat deskew(double angle, Mat img){
+  
+  std::vector<cv::Point> points;
+  cv::Mat_<uchar>::iterator it = img.begin<uchar>();
+  cv::Mat_<uchar>::iterator end = img.end<uchar>();
+  for (; it != end; ++it)
+    if (*it)
+      points.push_back(it.pos());
+ 
+  RotatedRect box = minAreaRect(cv::Mat(points));
+  
+  Mat rot_mat = getRotationMatrix2D(box.center, angle, 1);
+  Mat rotated;
+  warpAffine(img, rotated, rot_mat, img.size(), INTER_CUBIC);
+  
+  Size box_size = box.size;
+  if (box.angle < -45.)
+    std::swap(box_size.width, box_size.height);
+  Mat cropped;
+  getRectSubPix(rotated, box_size, box.center, cropped);
+   
+  bitwise_not(cropped, cropped);
+ 
+  return cropped;
+  }
+
+double compute_skew(Mat img) {
+   
+   cv::Size size = img.size();
+   bitwise_not(img, img);
+   
+   //Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 3));
+   //cv::erode(img, img, element);
+   std::vector<cv::Point> points;
+   Mat_<uchar>::iterator it = img.begin<uchar>();
+   Mat_<uchar>::iterator end = img.end<uchar>();
+   for (; it != end; ++it)
+     if (*it)
+       points.push_back(it.pos());
+   
+   RotatedRect box = cv::minAreaRect(cv::Mat(points));
+   double angle = box.angle;
+   if (angle < -45.)
+     angle += 90.;
+     
+   printf("skew angle in degrees: %f \n", angle  );
+   return angle;
+}
+
+
 Mat captureImage(){
 	printf("====> capturing image\n");
 	if(!Camera.grab()) {
@@ -110,12 +162,19 @@ Mat captureImage(){
 	return image;
 	}
 
-//Mat imageProcessing(Mat src){
-	//// convert to binary ADAPTIVE_THRESH_GAUSSIAN_C or ADAPTIVE_THRESH_MEAN_C
-	//adaptiveThreshold(src, src, 255,ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY,15,5);
-	//bitwise_not(src, src);
-	//return src;	
-	//}
+Mat imageProcessing(Mat src){
+	// convert to binary ADAPTIVE_THRESH_GAUSSIAN_C or ADAPTIVE_THRESH_MEAN_C
+	adaptiveThreshold(src, src, 255,ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY,15,5);
+	bitwise_not(src, src);
+	//threshold(src, src, 150, 255, cv::THRESH_BINARY);
+    //return src;
+    
+	//double degrees = compute_skew(src);
+	//if((0.00 < degrees < 1.00 )|| (0.00 > degrees > -1.00))
+		return src;
+	//Mat result= deskew(-15.00, src);
+    //return result;	
+	}
 
 string diacritizeText(string text){
 	std::ostringstream os;
@@ -131,7 +190,35 @@ string diacritizeText(string text){
     return result;
 	}
 
+Pix* matToPix(Mat src){
+	Pix *image = pixCreate(src.size().width, src.size().height, 8);
 
+	for(int i=0; i<src.rows; i++) 
+		for(int j=0; j<src.cols; j++) 
+			pixSetPixel(image, j,i, (l_uint32) src.at<uchar>(i,j));
+	return image;
+	}
+
+
+//Mat combineImages(Mat image1, Mat image2, Mat image3){
+	//vector<Mat> imgs;
+    //printf("imgs push\n");
+	//imgs.push_back(image3);
+	//imgs.push_back(image2);
+	//imgs.push_back(image1);
+	//Mat pano;
+	//Stitcher::Mode mode = Stitcher::PANORAMA;
+    //printf("create stiticher\n");
+    //Ptr<Stitcher> stitcher = Stitcher::create(mode, false);
+    //printf("before stitiching\n");
+    //Stitcher::Status status = stitcher->stitch(imgs, pano);
+      //if (status != Stitcher::OK)
+    //{
+        //cout << "Can't stitch images, error code = " << int(status) << endl;
+    //}
+    //return pano;
+	//}
+	
 string getResultText(char *text){
 		string resultText;
 		if(strlen(text) == 0)
@@ -152,9 +239,7 @@ string ocr(Mat img){
 	api->SetImage((uchar*)img.data, img.size().width, img.size().height, 
 	img.channels(), img.step1());
 	char *text = api->GetUTF8Text();
-	string result = getResultText(text);
-	delete[] text;
-	return result;
+	return getResultText(text);
 }
 	
 void imageToSpeech(Mat img){
@@ -166,6 +251,7 @@ void imageToSpeech(Mat img){
 	espeak_Synth(resultText.c_str(), resultText.size()+1, position, 
 	positionType, endPosition, flags, NULL, userData);
 	espeak_Synchronize();
+	delete[] text;
 }
 
 int main(int argc, char* argv[]) {

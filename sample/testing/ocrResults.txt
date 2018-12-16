@@ -1,0 +1,51 @@
+Andalus size: 16
+word accuracy = 26.021596
+accuracy = 63.541547
+ ================= 
+
+Andalus size: 18
+word accuracy = 24.925895
+accuracy = 63.158281
+ ================= 
+
+Andalus size: 24
+word accuracy = 22.395723
+accuracy = 61.516562
+ ================= 
+
+DecoType Naskh Extensions size: 12
+word accuracy = 0.000000
+accuracy = 65.000000
+ ================= 
+
+DecoType Naskh Extensions size: 16
+word accuracy = 25.958077
+accuracy = 56.696749
+ ================= 
+
+DecoType Naskh Extensions size: 18
+word accuracy = 25.402287
+accuracy = 56.593238
+ ================= 
+
+DecoType Naskh Extensions size: 24
+word accuracy = 24.777684
+accuracy = 55.434728
+ ================= >>>
+
+DecoType Thuluth size: 12
+word accuracy = 22.670972
+accuracy = 59.385673
+ ================= 
+
+DecoType Thuluth size: 16
+word accuracy = 22.226339
+accuracy = 58.495358
+ ================= 
+
+DecoType Thuluth size: 24
+word accuracy = 19.860258
+accuracy = 56.317708
+ ================= 
+
+
