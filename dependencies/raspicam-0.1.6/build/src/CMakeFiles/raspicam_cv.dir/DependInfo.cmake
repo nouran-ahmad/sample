@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/src/raspicam_cv.cpp" "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/src/CMakeFiles/raspicam_cv.dir/raspicam_cv.cpp.o"
-  "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/src/raspicam_still_cv.cpp" "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/src/CMakeFiles/raspicam_cv.dir/raspicam_still_cv.cpp.o"
+  "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/src/raspicam_cv.cpp" "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/src/CMakeFiles/raspicam_cv.dir/raspicam_cv.cpp.o"
+  "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/src/raspicam_still_cv.cpp" "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/src/CMakeFiles/raspicam_cv.dir/raspicam_still_cv.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -14,8 +14,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../dependencies/current"
   "../dependencies/current/interface"
   "../dependencies/current/interface/mmal"
-  "/usr/local/include"
-  "/usr/local/include/opencv"
+  "/usr/local/include/opencv4"
   "../src/."
   "src"
   )

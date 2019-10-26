@@ -6,5 +6,5 @@ CXX_FLAGS =  -std=c++0x -Wl,--no-as-needed  -Wall -ffunction-sections   -fomit-f
 
 CXX_DEFINES = -DDSO_EXPORTS
 
-CXX_INCLUDES = -I/home/pi/Desktop/project/dependencies/raspicam-0.1.6/dependencies/current -I/home/pi/Desktop/project/dependencies/raspicam-0.1.6/dependencies/current/interface -I/home/pi/Desktop/project/dependencies/raspicam-0.1.6/dependencies/current/interface/mmal -I/usr/local/include -I/usr/local/include/opencv -I/home/pi/Desktop/project/dependencies/raspicam-0.1.6/src/. -I/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/src 
+CXX_INCLUDES = -I/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/dependencies/current -I/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/dependencies/current/interface -I/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/dependencies/current/interface/mmal -I/usr/local/include/opencv4 -I/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/src/. -I/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/src 
 

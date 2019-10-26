@@ -1,4 +1,4 @@
-# Install script for directory: /home/pi/Desktop/project/dependencies/raspicam-0.1.6
+# Install script for directory: /home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -33,17 +33,17 @@ if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 endif()
 
 if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake" TYPE FILE FILES "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/Findraspicam.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake" TYPE FILE FILES "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/Findraspicam.cmake")
 endif()
 
 if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake" TYPE FILE FILES "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/raspicamConfig.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake" TYPE FILE FILES "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/raspicamConfig.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/src/cmake_install.cmake")
-  include("/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/utils/cmake_install.cmake")
+  include("/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/src/cmake_install.cmake")
+  include("/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/utils/cmake_install.cmake")
 
 endif()
 
@@ -55,5 +55,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

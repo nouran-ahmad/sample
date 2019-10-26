@@ -1,13 +1,21 @@
 
-echo installing tesseract:
-echo ==============================
 
-sudo apt-get install pkg-config
+sudo apt-get install make autoconf automake libtool pkg-config cmake
 sudo apt-get install libpng-dev libjpeg8-dev install libtiff5-dev zlib1g-dev
-
 sudo apt-get install libicu-dev libpango1.0-dev libcairo2-dev libleptonica-dev
 
 cd /home/pi/Desktop/project/sample/dependencies
+
+echo installing leptonica lib:
+echo ==============================
+#curl -O http://leptonica.org/source/leptonica-1.76.0.tar.gz
+#tar -xvzf ./leptonica-1.76.0.tar.gz
+./leptonica-1.76.0/configure
+make
+sudo make install
+
+echo installing tesseract:
+echo ==============================
 
 git clone https://github.com/tesseract-ocr/tesseract.git
 cd ./tesseract
@@ -21,22 +29,10 @@ make training
 sudo make install training-install
 cd ..
 
-echo installing leptonica lib:
-echo ==============================
-curl -O http://leptonica.org/source/leptonica-1.76.0.tar.gz
-tar -xvzf ./leptonica-1.76.0.tar.gz
-cd ./leptonica-1.76.0
-./configure
-make
-sudo make install
-cd ..
-
 echo installing pulseAudio cli and libs:
 echo ==============================
 
-sudo apt-get install pulseaudio
-sudo apt-get install libasound2-dev
-sudo apt-get install libpulse-dev
+sudo apt-get install pulseaudio libasound2-dev libpulse-dev
 
 git clone https://github.com/rhdunn/pcaudiolib.git
 cd ./pcaudiolib
@@ -48,8 +44,6 @@ cd ..
 
 echo installing autotools:
 echo ==============================
-
-sudo apt-get install make autoconf automake libtool pkg-config
 
 echo cloning and installing espeak-ng:
 echo ==============================
@@ -88,8 +82,8 @@ cd ../..
 echo installing raspicam lib:
 echo ==============================
 cd ./raspicam-0.1.6
-sudo apt-get install unzip
-unzip raspicam-0.1.6.zip
+#sudo apt-get install unzip
+#unzip raspicam-0.1.6.zip
 
 mkdir build
 cd build

@@ -2,11 +2,11 @@
 # File that provides "make uninstall" target
 #  We use the file 'install_manifest.txt'
 # -----------------------------------------------
-IF(NOT EXISTS "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/install_manifest.txt")
-  MESSAGE(FATAL_ERROR "Cannot find install manifest: \"/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/install_manifest.txt\"")
-ENDIF(NOT EXISTS "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/install_manifest.txt")
+IF(NOT EXISTS "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/install_manifest.txt")
+  MESSAGE(FATAL_ERROR "Cannot find install manifest: \"/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/install_manifest.txt\"")
+ENDIF(NOT EXISTS "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/install_manifest.txt")
 
-FILE(READ "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/install_manifest.txt" files)
+FILE(READ "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/install_manifest.txt" files)
 STRING(REGEX REPLACE "\n" ";" files "${files}")
 FOREACH(file ${files})
   MESSAGE(STATUS "Uninstalling \"$ENV{DESTDIR}${file}\"")

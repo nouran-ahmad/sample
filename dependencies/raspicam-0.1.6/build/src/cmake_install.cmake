@@ -1,4 +1,4 @@
-# Install script for directory: /home/pi/Desktop/project/dependencies/raspicam-0.1.6/src
+# Install script for directory: /home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -46,9 +46,9 @@ if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "main" OR NOT CMAKE_INSTALL_COMPONENT)
     endif()
   endforeach()
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE FILES
-    "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/src/libraspicam.so.0.1.6"
-    "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/src/libraspicam.so.0.1"
-    "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/src/libraspicam.so"
+    "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/src/libraspicam.so.0.1.6"
+    "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/src/libraspicam.so.0.1"
+    "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/src/libraspicam.so"
     )
   foreach(file
       "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libraspicam.so.0.1.6"
@@ -75,7 +75,7 @@ if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "main" OR NOT CMAKE_INSTALL_COMPONENT)
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libraspicam_cv.so"
          RPATH "")
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE FILES "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/build/src/libraspicam_cv.so")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE FILES "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/build/src/libraspicam_cv.so")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libraspicam_cv.so" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libraspicam_cv.so")
     file(RPATH_CHANGE
@@ -90,10 +90,10 @@ endif()
 
 if("${CMAKE_INSTALL_COMPONENT}" STREQUAL "main" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include/raspicam" TYPE FILE FILES
-    "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/src/raspicamtypes.h"
-    "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/src/raspicam.h"
-    "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/src/raspicam_cv.h"
-    "/home/pi/Desktop/project/dependencies/raspicam-0.1.6/src/raspicam_still_cv.h"
+    "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/src/raspicamtypes.h"
+    "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/src/raspicam.h"
+    "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/src/raspicam_cv.h"
+    "/home/pi/Desktop/project/sample/dependencies/raspicam-0.1.6/src/raspicam_still_cv.h"
     )
 endif()
 
