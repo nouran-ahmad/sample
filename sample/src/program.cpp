@@ -13,8 +13,9 @@
 #include <ctime>
 #include <chrono>
 #include <unistd.h>
-//#include <opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
+#include <opencv2/core/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Options.hpp>
@@ -90,9 +91,9 @@ void setupEspeak() {
 }
 
 void setupRaspicam(){
-	Camera.set( CV_CAP_PROP_FORMAT, CV_8UC1 ); //gray
-	Camera.set(CV_CAP_PROP_FRAME_WIDTH, 640);
-	Camera.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
+	Camera.set(CAP_PROP_FORMAT, CV_8UC1 ); //gray
+	Camera.set(CAP_PROP_FRAME_WIDTH, 640);
+	Camera.set(CAP_PROP_FRAME_HEIGHT, 480);
 	if ( !Camera.open() ) {
 		printf("Error opening camera");
 		exit(1);

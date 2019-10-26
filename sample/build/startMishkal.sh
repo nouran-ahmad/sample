@@ -1,2 +1,2 @@
-cd /Desktop/project/dependencies/mishkal/interfaces/web
+cd ~/Desktop/project/sample/dependencies/mishkal/interfaces/web
 ./mishkal-webserver.py
