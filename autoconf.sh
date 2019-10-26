@@ -2,7 +2,7 @@
 
 sudo apt-get install make autoconf automake libtool pkg-config cmake
 sudo apt-get install libpng-dev libjpeg8-dev install libtiff5-dev zlib1g-dev
-sudo apt-get install libicu-dev libpango1.0-dev libcairo2-dev libleptonica-dev
+sudo apt-get install libicu-dev libpango1.0-dev libcairo2-dev libleptonica-dev libcurl4-openssl-dev
 
 cd /home/pi/Desktop/project/sample/dependencies
 
