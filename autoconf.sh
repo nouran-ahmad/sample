@@ -10,9 +10,11 @@ echo installing leptonica lib:
 echo ==============================
 #curl -O http://leptonica.org/source/leptonica-1.76.0.tar.gz
 #tar -xvzf ./leptonica-1.76.0.tar.gz
-./leptonica-1.76.0/configure
-make
+cd ./leptonica-1.76.0
+#./configure
+#make
 sudo make install
+cd ..
 
 echo installing tesseract:
 echo ==============================
@@ -58,13 +60,13 @@ cd ..
 
 echo downloading mbrola binaries:
 echo ==============================
-curl -O http://tcts.fpms.ac.be/synthesis/mbrola/bin/raspberri_pi/mbrola.tgz
-sudo tar -xvzf ./mbrola.tgz -C /usr/local/bin
+#curl -O http://tcts.fpms.ac.be/synthesis/mbrola/bin/raspberri_pi/mbrola.tgz
+#sudo tar -xvzf ./mbrola.tgz -C /usr/local/bin
 
-sudo mkdir /usr/share/mbrola
+#sudo mkdir /usr/share/mbrola
  
-cp ./mbrola/ar1 -r /usr/share/mbrola
-cp ./mbrola/ar2 -r /usr/share/mbrola
+#cp ./mbrola/ar1 -r /usr/share/mbrola
+#cp ./mbrola/ar2 -r /usr/share/mbrola
 
 echo installing opencv:
 ================
